@@ -4,6 +4,7 @@
 	import { Checkbox } from '$lib/components/ui/checkbox';
 	import { Trash2, Folder, Database, Loader2, ArrowRight } from 'lucide-svelte';
 	import GitGenericIcon from '$lib/components/icons/GitGenericIcon.svelte';
+	import StackIcon from '$lib/components/StackIcon.svelte';
 	import { appendEnvParam } from '$lib/stores/environment';
 
 	// The parent owns the fetch; onConfirm receives what the user chose to remove.
@@ -11,11 +12,13 @@
 		open = $bindable(false),
 		stackName = '',
 		envId = null as number | null,
+		stackIcon = null as string | null,
 		onConfirm,
 	}: {
 		open?: boolean;
 		stackName?: string;
 		envId?: number | null;
+		stackIcon?: string | null;
 		onConfirm: (opts: { deleteFiles: boolean; deleteVolumes: boolean }) => void | Promise<void>;
 	} = $props();
 
@@ -90,7 +93,7 @@
 	<Dialog.Content class="max-w-2xl">
 		<Dialog.Header>
 			<Dialog.Title class="flex items-center gap-2">
-				<Trash2 class="w-5 h-5 text-destructive" />
+				<StackIcon icon={stackIcon} {stackName} {envId} class="w-5 h-5 shrink-0 text-muted-foreground" />
 				Remove stack "{stackName}"
 			</Dialog.Title>
 			<Dialog.Description>

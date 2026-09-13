@@ -1,5 +1,23 @@
 [
   {
+    "version": "1.0.48",
+    "date": "",
+    "comingSoon": true,
+    "changes": [
+      { "type": "feature", "text": "bulk-delete snapshots, and optionally forget a config's snapshots when you delete it (#1556)" },
+      { "type": "feature", "text": "option to choose which stack operations show the full log (#1558)" },
+      { "type": "feature", "text": "show the stack icon and name in stack action popups (#1526)" },
+      { "type": "fix", "text": "log in to registries over TLS on remote HTTPS environments (#1557)" },
+      { "type": "fix", "text": "vulnerability scans and alerts show the image tag, not just its digest (#1528)" },
+      { "type": "fix", "text": "resolve secret provider references when restoring a stack from a backup (#1521)" },
+      { "type": "fix", "text": "stop password managers from offering to save stack secret env-var fields (#1517)" },
+      { "type": "fix", "text": "repository stats no longer fail on the backups screen (#1561)" },
+      { "type": "fix", "text": "dashboard image disk usage no longer counts shared layers multiple times (PR#1461, @omggga)" },
+      { "type": "feature", "text": "add a docker attach terminal mode (#1078, PR#1377, @ivanjx)" }
+    ],
+    "imageTag": "fnsys/dockhand:v1.0.48"
+  },
+  {
     "version": "1.0.47",
     "date": "2026-09-12",
     "comingSoon": false,

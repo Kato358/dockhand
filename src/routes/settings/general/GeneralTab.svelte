@@ -8,7 +8,8 @@
 	import { TogglePill, ToggleSwitch } from '$lib/components/ui/toggle-pill';
 	import CronEditor from '$lib/components/cron-editor.svelte';
 	import TimezoneSelector from '$lib/components/TimezoneSelector.svelte';
-	import { Eye, Bell, Database, Calendar, ShieldCheck, FileText, AlertTriangle, HelpCircle, Globe, Activity, Clock, Info, Save, RotateCcw, LayoutDashboard, Tags, Archive, ChevronRight, ChevronDown, Compass } from 'lucide-svelte';
+	import { Eye, Bell, Database, Calendar, ShieldCheck, FileText, AlertTriangle, HelpCircle, Globe, Activity, Clock, Info, Save, RotateCcw, LayoutDashboard, Tags, Archive, ChevronRight, ChevronDown, Compass, Layers } from 'lucide-svelte';
+	import { STACK_LOG_OPERATIONS, type StackLogOperation } from '$lib/utils/stack-log-operations';
 	import CodeEditor from '$lib/components/CodeEditor.svelte';
 	import { appSettings, type DateFormat, type DownloadFormat, type EventCollectionMode, type LabelFilterMode } from '$lib/stores/settings';
 	import { canAccess, authStore } from '$lib/stores/auth';
@@ -42,6 +43,14 @@
 	let defaultTrivyImage = $derived($appSettings.defaultTrivyImage);
 	let defaultScannerNetworkMode = $derived($appSettings.defaultScannerNetworkMode);
 	let defaultScannerDns = $derived($appSettings.defaultScannerDns);
+	let stackLogOperations = $derived($appSettings.stackLogOperations);
+
+	function toggleStackLogOperation(op: StackLogOperation, show: boolean) {
+		const next = show
+			? [...stackLogOperations, op]
+			: stackLogOperations.filter((o) => o !== op);
+		appSettings.setStackLogOperations(next);
+	}
 	let showAdvancedScannerSettings = $state(false);
 	let defaultComposeTemplate = $derived($appSettings.defaultComposeTemplate);
 	let labelFilterMode = $derived($appSettings.labelFilterMode);
@@ -777,6 +786,30 @@ services:
 								</div>
 							</div>
 						</div>
+					</div>
+				</Card.Content>
+			</Card.Root>
+
+			<Card.Root>
+				<Card.Header>
+					<Card.Title class="text-sm font-medium flex items-center gap-2">
+						<Layers class="w-4 h-4" />
+						Stack operation logs
+					</Card.Title>
+					<p class="text-xs text-muted-foreground">Choose which stack operations open the full compose-log popover. Unchecked operations run quietly with just a toast; their log still opens automatically if the operation fails.</p>
+				</Card.Header>
+				<Card.Content>
+					<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-3">
+						{#each STACK_LOG_OPERATIONS as op}
+							<div class="flex items-center gap-3">
+								<TogglePill
+									checked={stackLogOperations.includes(op.key)}
+									onchange={(checked) => toggleStackLogOperation(op.key, checked)}
+									disabled={!$canAccess('settings', 'edit')}
+								/>
+								<Label>{op.label}</Label>
+							</div>
+						{/each}
 					</div>
 				</Card.Content>
 			</Card.Root>

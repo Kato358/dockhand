@@ -199,6 +199,12 @@
 						disabled={readonly}
 						oninput={() => onchange?.()}
 						class="h-9 font-mono text-xs"
+						autocomplete="off"
+						data-1p-ignore
+						data-bwignore
+						data-lpignore="true"
+						data-form-type="other"
+						data-protonpass-ignore
 					/>
 				</div>
 

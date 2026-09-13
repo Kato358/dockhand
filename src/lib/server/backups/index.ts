@@ -15,7 +15,7 @@ import { RestoreService, type RestorePorts, type RestoreJob } from './restore-se
 import { openOperation } from './operations';
 import { LiveTargetLocks, DestinationSerializer } from './locks';
 import { resolveTargets, discoverVolumes, stopForBackup } from './docker';
-import { guardSnapshotAccess, listSnapshots as listSnapshotsCore, resolveSnapshotEnvId as resolveSnapshotEnvIdCore, filterSnapshotsByAccessibleEnv } from './snapshots';
+import { guardSnapshotAccess, selectOwnedForForget, listSnapshots as listSnapshotsCore, resolveSnapshotEnvId as resolveSnapshotEnvIdCore, filterSnapshotsByAccessibleEnv } from './snapshots';
 import { initRepository as initRepoCore, testRepository as testRepoCore, checkRepository, pruneRepository, unlockRepository, repoStats, rotateDestinationPassword as rotateCore } from './repo';
 import { parseRetention, buildForgetArgs, checkWouldWipe } from './retention';
 import { buildSnapshotLayout, serializeLayout, parseSnapshotLayout, type SnapshotLayout, type SnapshotStack, type SnapshotSecret } from './snapshot-layout';
@@ -1332,6 +1332,75 @@ export async function forgetSnapshot(destinationId: number, snapshotId: string):
 	logRepoOp(destination.name, `forget ${snapshotId.slice(0, 8)}`, run.exitCode === 0, { output: run.stdout, error: run.stderr });
 	if (run.exitCode !== 0) return { ok: false, reason: 'error', error: run.stderr.trim() || 'forget failed' };
 	return { ok: true };
+}
+
+export type ForgetSnapshotsResult = {
+	/** Snapshot ids that were forgotten (owned + passed to restic). */
+	deleted: string[];
+	/** Ids we refused: not owned by this instance or not env-accessible (never sent to restic). */
+	skipped: string[];
+	error?: string;
+};
+
+/** Per-id vetting for forgetSnapshots. `access` carries the enterprise env gate so the
+ * ONE ownership listing per id also covers env access - no separate per-id env round-trip
+ * at the route. `preVetted` skips the per-id guard when the caller has already proven
+ * instance ownership + env access for every id via the SAME instance-scoped restic listing
+ * (e.g. a `--tag instance,configid` config listing), which is a strictly stronger proof. */
+export type ForgetSnapshotsOptions = {
+	access?: { isEnterprise: boolean; canAccessEnvironment: (envId: number) => Promise<boolean> };
+	preVetted?: boolean;
+};
+
+const FULL_ACCESS = { isEnterprise: false, canAccessEnvironment: async () => true };
+
+/**
+ * Forget MANY snapshots from ONE destination in a single `restic forget ... --prune`
+ * (prunes once, not per-id). Every id is instance-ownership- and (enterprise) env-access-
+ * checked first via ONE restic listing per id; ids that fail are skipped (never passed to
+ * restic) so a bulk delete can't reach another instance's or another env's snapshots
+ * sharing the repo. Pass `preVetted` only when the ids came from an instance-scoped
+ * listing that already proved ownership + access. All owned ids share the one lock.
+ */
+export async function forgetSnapshots(
+	destinationId: number,
+	snapshotIds: string[],
+	options: ForgetSnapshotsOptions = {},
+): Promise<ForgetSnapshotsResult> {
+	const destination = await loadDest(destinationId);
+	const instanceId = await getInstanceId();
+	const access = options.access ?? FULL_ACCESS;
+
+	const { owned, skipped } = await selectOwnedForForget(snapshotIds, {
+		preVetted: options.preVetted,
+		guard: (id) => guardSnapshotAccess(reader(), destination, instanceId, id, access),
+	});
+	if (owned.length === 0) return { deleted: [], skipped };
+
+	const run = await serializeByRepo(destinationId, () =>
+		restic.runLocal(destination, ['forget', ...owned, '--prune', '--retry-lock', '5m'], 'data'),
+	);
+	logRepoOp(destination.name, `forget ${owned.length} snapshot(s)`, run.exitCode === 0, { output: run.stdout, error: run.stderr });
+	if (run.exitCode !== 0) return { deleted: [], skipped, error: run.stderr.trim() || 'forget failed' };
+	return { deleted: owned, skipped };
+}
+
+/**
+ * Forget every snapshot belonging to a backup config (matched by its `dockhand:configid`
+ * tag) from its destination, in a single restic forget --prune. Used when a config is
+ * deleted WITH "also delete snapshots". Best-effort: returns the tally; a restic error is
+ * reported, never thrown, so it can't fail the config deletion that already happened.
+ * The listing is `--tag instance,configid` scoped, a stronger ownership proof than the
+ * per-id guard, so the ids are forgotten preVetted (no redundant per-id re-listing).
+ * CALLER CONTRACT: `preVetted` suppresses the per-snapshot env guard, so the caller MUST
+ * gate on the config's environment first. The DELETE config route does (loadConfigGateEnv),
+ * and every id here shares that already-gated config's env - keep this true for any new caller.
+ */
+export async function forgetSnapshotsForConfig(configId: number, destinationId: number): Promise<ForgetSnapshotsResult> {
+	const snaps = await listSnapshots(destinationId, configId).catch(() => []);
+	const ids = snaps.map((s) => s.id);
+	if (ids.length === 0) return { deleted: [], skipped: [] };
+	return forgetSnapshots(destinationId, ids, { preVetted: true });
 }
 
 // --- repository maintenance ---

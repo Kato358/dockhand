@@ -47,4 +47,22 @@ describe('restore redeploy force-recreates', () => {
 		// Whitespace-tolerant: `forceRecreate: true` in the options object.
 		expect(body).toMatch(/forceRecreate\s*:\s*true/);
 	});
+
+	// A restore loads raw DB secrets; if this path skips the provider-resolution choke
+	// point, a secret-marked op://... reaches the container as the literal reference
+	// string. Guard the wiring at the source level (a real behavioral test needs a
+	// local dev server + a fake provider CLI, which the CI shard can't host): the
+	// resolver must be CALLED, its result ASSIGNED BACK to the vars, and it must run
+	// BEFORE the deploy - so a refactor that drops the result or reorders the call fails.
+	test('redeployStackFromDir resolves provider references and uses the result before deploying', () => {
+		const call = body.indexOf('resolveProviderEnvVars(');
+		const deploy = body.indexOf('executeComposeCommand(');
+		expect(call).toBeGreaterThan(-1);
+		expect(deploy).toBeGreaterThan(-1);
+		// resolution happens before the compose command runs
+		expect(call).toBeLessThan(deploy);
+		// the resolved maps are assigned back (result not discarded)
+		expect(body).toMatch(/=\s*resolved\.dbNonSecretVars/);
+		expect(body).toMatch(/=\s*resolved\.secretVars/);
+	});
 });

@@ -17,7 +17,7 @@ import {
 import { getEnvironment, getEnvSetting, getSetting } from './db';
 import { sendEventNotification } from './notifications';
 import { detectRemoteSocketPath } from './scanner-socket-detect';
-import { truncateForLog, classifyUnparseableOutput } from './scanner-output-core';
+import { truncateForLog, classifyUnparseableOutput, pickScanDisplayName } from './scanner-output-core';
 import {
 	getHostDockerSocket,
 	getHostDataDir,
@@ -565,15 +565,21 @@ function parseTrivyOutput(output: string): { vulnerabilities: Vulnerability[]; s
 	return { vulnerabilities, summary };
 }
 
-// Get the SHA256 image ID for a given image name/tag
-async function getImageSha(imageName: string, envId?: number): Promise<string> {
+/**
+ * Resolve the stable image ID AND a human-readable display name from ONE inspect.
+ * The scan is driven by `imageRef`, which the auto-update path passes as a bare digest; that
+ * digest would otherwise be stored and shown in notifications. `displayName` prefers a real
+ * RepoTag (see pickScanDisplayName); `imageId` is the SHA used for cache keying (unchanged).
+ */
+async function resolveImageIdentity(imageRef: string, envId?: number): Promise<{ imageId: string; displayName: string }> {
 	try {
-		const imageInfo = await inspectImage(imageName, envId) as any;
-		// The Id field contains the full sha256:... hash
-		return imageInfo.Id || imageName;
+		const info = await inspectImage(imageRef, envId) as any;
+		return {
+			imageId: info.Id || imageRef,
+			displayName: pickScanDisplayName(imageRef, info.RepoTags)
+		};
 	} catch {
-		// If we can't inspect the image, fall back to the name
-		return imageName;
+		return { imageId: imageRef, displayName: imageRef };
 	}
 }
 
@@ -920,12 +926,12 @@ export async function scanWithGrype(
 
 		const { vulnerabilities, summary } = parseGrypeOutput(output);
 
-		// Get the actual SHA256 image ID for reliable caching
-		const imageId = await getImageSha(imageName, envId);
+		// SHA256 id for caching + a readable name for the record/notification.
+		const { imageId, displayName } = await resolveImageIdentity(imageName, envId);
 
 		const result: ScanResult = {
 			imageId,
-			imageName,
+			imageName: displayName,
 			scanner: 'grype',
 			scannedAt: new Date().toISOString(),
 			vulnerabilities,
@@ -1017,12 +1023,12 @@ export async function scanWithTrivy(
 
 		const { vulnerabilities, summary } = parseTrivyOutput(output);
 
-		// Get the actual SHA256 image ID for reliable caching
-		const imageId = await getImageSha(imageName, envId);
+		// SHA256 id for caching + a readable name for the record/notification.
+		const { imageId, displayName } = await resolveImageIdentity(imageName, envId);
 
 		const result: ScanResult = {
 			imageId,
-			imageName,
+			imageName: displayName,
 			scanner: 'trivy',
 			scannedAt: new Date().toISOString(),
 			vulnerabilities,
@@ -1110,8 +1116,10 @@ export async function scanImage(
 			unknown: Math.max(...results.map(r => r.summary.unknown))
 		};
 
-		// Send notifications (async, don't block return)
-		sendVulnerabilityNotifications(imageName, combinedSummary, envId).catch(err => {
+		// Notify with the readable name the scan resolved (a tag when the image has one),
+		// not the bare digest the caller may have passed in.
+		const notifyName = results[0]?.imageName || imageName;
+		sendVulnerabilityNotifications(notifyName, combinedSummary, envId).catch(err => {
 			const errorMsg = err instanceof Error ? err.message : String(err);
 			console.error('[Scanner] Failed to send vulnerability notifications:', errorMsg);
 		});

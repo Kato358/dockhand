@@ -22,6 +22,8 @@
 		onOpenChange?: (open: boolean) => void;
 		children: Snippet<[{ open: boolean }]>;
 		extraContent?: Snippet;
+		/** Optional leading glyph rendered before the confirm text (e.g. a stack icon). */
+		icon?: Snippet;
 	}
 
 	let {
@@ -39,7 +41,8 @@
 		onConfirm,
 		onOpenChange,
 		children,
-		extraContent
+		extraContent,
+		icon
 	}: Props = $props();
 
 	const triggerClass = $derived(unstyled
@@ -109,7 +112,8 @@
 	>
 		<div class="flex flex-col gap-1.5">
 			<div class="flex items-center gap-2">
-				<span class="text-xs whitespace-nowrap">{action} {itemType} {#if displayName}<strong>{displayName}</strong>{/if}?</span>
+				{#if icon}{@render icon()}{/if}
+				<span class="text-xs whitespace-nowrap">{action} {itemType} {#if displayName}<strong class="font-semibold text-foreground">{displayName}</strong>{/if}?</span>
 				<Button size="sm" {variant} class="h-6 px-2 text-xs" onclick={handleConfirm}>
 					{confirmText}
 				</Button>

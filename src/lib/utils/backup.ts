@@ -434,3 +434,66 @@ export function selectOwnSnapshotsFromDestination<S extends { tags?: string[] }>
 		.filter((s) => snapshotMatchesConfigScope(s.tags, configIds, targetName))
 		.map((s) => ({ ...s, _destinationId: dest.id, _destinationName: dest.name, _destinationRepository: dest.repository }));
 }
+
+/**
+ * Group snapshots by their destination id, returning `{ destinationId, snapshotIds }`
+ * batches. Bulk delete needs this because `restic forget` runs against ONE repo at a
+ * time, so a selection spanning multiple destinations becomes one batch call per dest.
+ * Pure so the grouping is unit-tested independently of the UI.
+ */
+export function groupSnapshotIdsByDestination<S extends { id: string; _destinationId: number }>(
+	snaps: S[]
+): { destinationId: number; snapshotIds: string[] }[] {
+	const byDest = new Map<number, string[]>();
+	for (const s of snaps) {
+		const arr = byDest.get(s._destinationId) ?? [];
+		arr.push(s.id);
+		byDest.set(s._destinationId, arr);
+	}
+	return [...byDest.entries()].map(([destinationId, snapshotIds]) => ({ destinationId, snapshotIds }));
+}
+
+export interface BulkDeleteResult {
+	deleted: number;
+	skipped: number;
+	/** true if any destination's batch call returned a non-2xx. */
+	failed: boolean;
+}
+
+/**
+ * Delete many snapshots via the batch endpoint, grouped by destination (one
+ * `restic forget --prune` per repo). Shared by every snapshot list (containers/stacks
+ * backup modal, the Backups page, the Settings repo browser) so the delete logic is one
+ * place. Callers own the UI (toasts, reload); this only performs the calls and tallies.
+ */
+export async function bulkDeleteSnapshots(
+	targets: { id: string; _destinationId: number }[]
+): Promise<BulkDeleteResult> {
+	let deleted = 0, skipped = 0, failed = false;
+	for (const { destinationId, snapshotIds } of groupSnapshotIdsByDestination(targets)) {
+		try {
+			const res = await fetch('/api/backup/snapshots/batch-delete', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ destinationId, snapshotIds })
+			});
+			const data = await res.json().catch(() => ({}));
+			deleted += data.deleted?.length ?? 0;
+			if (res.ok) skipped += data.skipped?.length ?? 0;
+			else failed = true;
+		} catch {
+			failed = true;
+		}
+	}
+	return { deleted, skipped, failed };
+}
+
+/**
+ * Consistent toast wording for a bulk-delete result, shared by every snapshot list.
+ * Returns { type, message } so each caller fires its own toast (import stays local).
+ */
+export function bulkDeleteToast(r: BulkDeleteResult): { type: 'success' | 'error'; message: string } {
+	if (r.failed) return { type: 'error', message: r.deleted > 0 ? `Deleted ${r.deleted}, but some snapshots could not be deleted` : 'Snapshots could not be deleted' };
+	if (r.deleted === 0 && r.skipped > 0) return { type: 'error', message: `${r.skipped} snapshot${r.skipped === 1 ? '' : 's'} could not be deleted (not owned or no access)` };
+	return { type: 'success', message: `Deleted ${r.deleted} snapshot${r.deleted === 1 ? '' : 's'}${r.skipped > 0 ? ` (${r.skipped} skipped)` : ''}` };
+}

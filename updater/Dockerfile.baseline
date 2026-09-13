@@ -13,7 +13,7 @@
 # for old x86_64 hardware, not an ARM concern.
 #
 # Rebuild trigger: the pipeline is change-gated on updater/, so touching this file
-# forces a rebuild of the -baseline tag.
+# forces a rebuild of the -baseline tag. (rebuild nonce: 2)
 FROM alpine:3.21
 
 # docker-cli (the stop/rm/rename/network/start the sidecar does) + busybox is the base

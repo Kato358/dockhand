@@ -3425,7 +3425,7 @@
         "tags": [
           "backup"
         ],
-        "summary": "Delete a backup configuration and unregister its schedule",
+        "summary": "Delete a backup configuration and unregister its schedule, optionally forgetting its snapshots too",
         "parameters": [
           {
             "name": "id",
@@ -3435,11 +3435,20 @@
               "type": "integer"
             },
             "description": "Backup configuration id (from GET /api/backup/configs)"
+          },
+          {
+            "name": "deleteSnapshots",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Also forget and prune this config's snapshots (default false; snapshots survive so a restore is still possible)"
           }
         ],
         "responses": {
           "200": {
-            "description": "Returns { success: true } once the configuration is deleted"
+            "description": "Returns { success: true }, plus { snapshots: { deleted, skipped, error? } } when deleteSnapshots=true"
           },
           "409": {
             "description": "A backup is currently running for this config — stop it before deleting"
@@ -3453,7 +3462,7 @@
             "bearerAuth": []
           }
         ],
-        "description": "Permission (\"backups:manage\") and environment-access denials (403) and not-found (404) are produced by the shared route guards."
+        "description": "Permission (\"backups:manage\") and environment-access denials (403) and not-found (404) are produced by the shared route guards. With deleteSnapshots=true the config's snapshots are forgotten and pruned (best-effort; reported in the response, never blocks the delete)."
       }
     },
     "/api/backup/configs/{id}/run": {
@@ -4777,6 +4786,68 @@
           }
         ],
         "description": "Job-polled so a proxy can't abort the restic dump at ~15s. The layout is redacted (stack secrets and container Config.Env/Labels stripped) before it leaves the server."
+      }
+    },
+    "/api/backup/snapshots/batch-delete": {
+      "post": {
+        "operationId": "post_api_backup_snapshots_batch-delete",
+        "tags": [
+          "backup"
+        ],
+        "summary": "Forget and prune several snapshots from one destination in a single restic forget --prune, with per-snapshot ownership and environment access gates",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Returns { success: true, deleted: string[], skipped: string[] } - deleted were forgotten, skipped were not owned or not accessible"
+          },
+          "400": {
+            "description": "Missing/invalid destinationId, empty snapshotIds, or an invalid snapshot id"
+          },
+          "500": {
+            "description": "Failed to forget the snapshots (restic error)"
+          }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Permission denial (403, \"backups:manage\") is produced by the shared requireBackups route guard. Per-snapshot ownership/environment failures are skipped (returned in `skipped`), not 403d.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "destinationId": {
+                    "type": "integer"
+                  },
+                  "snapshotIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "destinationId",
+                  "snapshotIds"
+                ]
+              },
+              "example": {
+                "destinationId": 3,
+                "snapshotIds": [
+                  "1a2b3c4d",
+                  "5e6f7a8b"
+                ]
+              }
+            }
+          }
+        }
       }
     },
     "/api/backup/snapshots/diff": {
@@ -23897,6 +23968,12 @@
                   },
                   "useSelfhstIcons": {
                     "type": "boolean"
+                  },
+                  "stackLogOperations": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
                   }
                 }
               },
@@ -23955,7 +24032,10 @@
                 "showWhatsNew": true,
                 "terminalFont": "string",
                 "timeFormat": "string",
-                "useSelfhstIcons": true
+                "useSelfhstIcons": true,
+                "stackLogOperations": [
+                  "string"
+                ]
               }
             }
           }

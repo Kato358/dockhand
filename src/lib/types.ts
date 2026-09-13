@@ -14,6 +14,9 @@ export interface NewerVersion {
 	digest?: string;
 }
 
+/** Terminal connection mode: an interactive `docker exec` shell, or `docker attach` to PID 1. */
+export type TerminalMode = 'exec' | 'attach';
+
 export interface ContainerInfo {
 	id: string;
 	name: string;

@@ -22,6 +22,7 @@
 	import { extractPangolinUrls } from '$lib/utils/pangolin-urls';
 	import { extractCaddyUrls } from '$lib/utils/caddy-urls';
 	import { appSettings } from '$lib/stores/settings';
+	import { shouldShowStackLog, type StackLogOperation } from '$lib/utils/stack-log-operations';
 	import ConfirmPopover from '$lib/components/ConfirmPopover.svelte';
 	import StackIcon from '$lib/components/StackIcon.svelte';
 	import ContainerIcon from '$lib/components/ContainerIcon.svelte';
@@ -538,12 +539,16 @@
 
 	let composeOutputStackName = $state<string | undefined>(undefined);
 
-	function startComposeOutput(title: string, stackName?: string) {
+	// `op` gates the log popover per the user's Settings choice (#1558): the output is
+	// always buffered (so it's ready if needed), but the popover only opens for ops the
+	// user opted into. `op` omitted = always show (deploy/git paths that pass no op).
+	// finishComposeOutput force-opens it on failure, so a quiet op still surfaces errors.
+	function startComposeOutput(title: string, stackName?: string, op?: StackLogOperation) {
 		composeOutputTitle = title;
 		composeOutputStackName = stackName;
 		composeOutputLines = [];
 		composeOutputRunning = true;
-		composeOutputOpen = true;
+		composeOutputOpen = op === undefined || shouldShowStackLog($appSettings.stackLogOperations, op);
 		composeOutputStartedAt = Date.now();
 		composeOutputOk = undefined;
 		composeOutputMs = undefined;
@@ -565,6 +570,9 @@
 		composeOutputOk = ok;
 		composeOutputMs = Date.now() - composeOutputStartedAt;
 		composeOutputExitCode = exitCode;
+		// A quiet op (popover suppressed by the setting) still surfaces its log on failure,
+		// so the user is never left with only a toast when something went wrong (#1558).
+		if (!ok) composeOutputOpen = true;
 		if (composeOutputLines.length === 0 && output) {
 			composeOutputLines = output.split('\n');
 		}
@@ -1024,7 +1032,7 @@
 	async function startStack(name: string) {
 		operationError = null;
 		stackActionLoading = name;
-		startComposeOutput(`Starting ${name}`, name);
+		startComposeOutput(`Starting ${name}`, name, 'start');
 		try {
 			const response = await fetch(appendEnvParam(`/api/stacks/${encodeURIComponent(name)}/start`, envId), { method: 'POST' });
 			const data = await readJobResponse(response, appendComposeOutputLine);
@@ -1053,7 +1061,7 @@
 	async function stopStack(name: string) {
 		operationError = null;
 		stackActionLoading = name;
-		startComposeOutput(`Stopping ${name}`, name);
+		startComposeOutput(`Stopping ${name}`, name, 'stop');
 		try {
 			const response = await fetch(appendEnvParam(`/api/stacks/${encodeURIComponent(name)}/stop`, envId), { method: 'POST' });
 			const data = await readJobResponse(response, appendComposeOutputLine);
@@ -1082,7 +1090,7 @@
 	async function restartStack(name: string, mode: 'restart' | 'ordered' | 'recreate' = 'restart') {
 		operationError = null;
 		stackActionLoading = name;
-		startComposeOutput(mode === 'recreate' ? `Recreating ${name}` : `Restarting ${name}`, name);
+		startComposeOutput(mode === 'recreate' ? `Recreating ${name}` : `Restarting ${name}`, name, 'restart');
 		try {
 			let url = appendEnvParam(`/api/stacks/${encodeURIComponent(name)}/restart`, envId);
 			if (mode === 'recreate' || mode === 'ordered') {
@@ -1117,7 +1125,7 @@
 	async function redeployStack(name: string, options: { pull: boolean; build: boolean; forceRecreate: boolean }) {
 		operationError = null;
 		stackActionLoading = name;
-		startComposeOutput(`Redeploying ${name}`, name);
+		startComposeOutput(`Redeploying ${name}`, name, 'deploy');
 		// Record which redeploy options were chosen so the log shows them (they are not
 		// otherwise visible once the popover closes).
 		const chosen = [
@@ -1163,7 +1171,7 @@
 		operationError = null;
 		stackActionLoading = name;
 		stackDownLoading = name;
-		startComposeOutput(`Bringing down ${name}`, name);
+		startComposeOutput(`Bringing down ${name}`, name, 'down');
 		try {
 			const response = await fetch(appendEnvParam(`/api/stacks/${encodeURIComponent(name)}/down`, envId), { method: 'POST' });
 			const data = await readJobResponse(response, appendComposeOutputLine);
@@ -1879,6 +1887,7 @@
 							<RedeployPopover
 								stackName={stack.name}
 								{envId}
+								stackIcon={stackSources[stack.name]?.icon}
 								side="bottom"
 								align="start"
 								disabled={stackActionLoading === stack.name}
@@ -2208,6 +2217,7 @@
 								<RedeployPopover
 									stackName={stack.name}
 									{envId}
+									stackIcon={stackSources[stack.name]?.icon}
 									disabled={stackActionLoading === stack.name}
 									onDeploy={(options) => redeployStack(stack.name, options)}
 								>
@@ -2253,8 +2263,11 @@
 											align="end"
 											sideOffset={8}
 										>
-											<div class="flex flex-col gap-2 w-60">
-												<span class="text-xs text-muted-foreground">Restart stack <strong>{stack.name.length > 20 ? stack.name.slice(0, 20) + '...' : stack.name}</strong></span>
+											<div class="flex flex-col gap-2 w-72">
+												<span class="flex items-center gap-1.5 text-xs text-muted-foreground">
+													<StackIcon icon={stackSources[stack.name]?.icon} stackName={stack.name} envId={$currentEnvironment?.id ?? null} class="w-4 h-4 shrink-0" />
+													<span class="truncate">Restart stack <strong class="font-semibold text-foreground">{stack.name}</strong></span>
+												</span>
 												<button class="flex flex-col items-start gap-0.5 rounded px-2 py-1.5 text-left hover:bg-muted" onclick={() => { restartPopoverOpen[stack.name] = false; restartStack(stack.name, 'restart'); }}>
 													<span class="text-xs font-medium">Restart</span>
 													<span class="text-[11px] text-muted-foreground">Fast in-place restart. Ignores depends_on ordering.</span>
@@ -2281,6 +2294,9 @@
 										onConfirm={() => stopStack(stack.name)}
 										onOpenChange={(open) => confirmStopName = open ? stack.name : null}
 									>
+										{#snippet icon()}
+											<StackIcon icon={stackSources[stack.name]?.icon} stackName={stack.name} envId={$currentEnvironment?.id ?? null} class="w-4 h-4 shrink-0" />
+										{/snippet}
 										{#snippet children({ open })}
 											<Square class="grid-action-icon grid-action-stop {open ? 'text-destructive' : 'text-muted-foreground hover:text-destructive'}" />
 										{/snippet}
@@ -2298,6 +2314,9 @@
 								onConfirm={() => downStack(stack.name)}
 								onOpenChange={(open) => confirmDownName = open ? stack.name : null}
 							>
+								{#snippet icon()}
+									<StackIcon icon={stackSources[stack.name]?.icon} stackName={stack.name} envId={$currentEnvironment?.id ?? null} class="w-4 h-4 shrink-0" />
+								{/snippet}
 								{#snippet children({ open })}
 									<ArrowBigDown class="grid-action-icon grid-action-stop {stackDownLoading === stack.name ? 'animate-bounce text-orange-500' : open ? 'text-orange-500' : 'text-muted-foreground hover:text-orange-500'}" />
 								{/snippet}
@@ -2871,6 +2890,7 @@
 	bind:open={showDeleteModal}
 	stackName={deleteStackName}
 	envId={envId ?? null}
+	stackIcon={stackSources[deleteStackName]?.icon}
 	onConfirm={(opts) => removeStack(deleteStackName, opts)}
 />
 

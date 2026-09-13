@@ -11,6 +11,7 @@ import { spawn as nodeSpawn } from 'node:child_process';
 import type { ChildProcess } from 'node:child_process';
 import { redactSecretVars } from './secret-redact';
 import { collectProcess } from './process-output-core';
+import { dockerTlsEnv } from './docker-tls-env';
 import { makeLineForwarder, makeRedactedLineSink } from './secret-redaction';
 import {
 	applyFileDeletions,
@@ -1045,7 +1046,15 @@ async function checkFlatLocalStackNameCollision(stackName: string, envId?: numbe
  * Login to all configured Docker registries before running compose commands.
  * This ensures that `docker compose up` can pull images from private registries.
  */
-async function loginToRegistries(dockerHost?: string, logPrefix = '[Stack]', apiVersion?: string): Promise<void> {
+// TLS material for a registry login against an HTTPS Docker daemon. `certDir` is the
+// temp dir compose already wrote ca/cert/key.pem into, reused so certs aren't written
+// twice; `skipVerify` mirrors the compose spawn's DOCKER_TLS_VERIFY.
+interface LoginTlsOptions {
+	certDir: string;
+	skipVerify?: boolean;
+}
+
+async function loginToRegistries(dockerHost?: string, logPrefix = '[Stack]', apiVersion?: string, tls?: LoginTlsOptions): Promise<void> {
 	const { getRegistries } = await import('./db.js');
 	const registries = await getRegistries();
 
@@ -1060,6 +1069,11 @@ async function loginToRegistries(dockerHost?: string, logPrefix = '[Stack]', api
 	// Pass through explicit DOCKER_API_VERSION if provided by caller
 	if (apiVersion) {
 		spawnEnv.DOCKER_API_VERSION = apiVersion;
+	}
+	// Speak TLS to an HTTPS daemon (mTLS proxy on :2376), same material compose uses -
+	// otherwise `docker login` talks plaintext HTTP and the terminator rejects it (#1557).
+	if (tls) {
+		Object.assign(spawnEnv, dockerTlsEnv(tls.certDir, tls.skipVerify));
 	}
 
 	for (const reg of registries) {
@@ -1360,10 +1374,8 @@ async function executeLocalCompose(
 			if (cleanedKey) writeFileSync(join(tlsCertDir, 'key.pem'), cleanedKey);
 		}
 
-		// Set Docker TLS environment variables
-		spawnEnv.DOCKER_TLS = '1';
-		spawnEnv.DOCKER_CERT_PATH = tlsCertDir;
-		spawnEnv.DOCKER_TLS_VERIFY = tlsConfig.skipVerify ? '0' : '1';
+		// Set Docker TLS environment variables (shared with the registry-login spawn, #1557)
+		Object.assign(spawnEnv, dockerTlsEnv(tlsCertDir, tlsConfig.skipVerify));
 
 		console.log(`${logPrefix} TLS enabled: DOCKER_CERT_PATH=${tlsCertDir}, DOCKER_TLS_VERIFY=${spawnEnv.DOCKER_TLS_VERIFY}`);
 	}
@@ -1457,7 +1469,8 @@ async function executeLocalCompose(
 
 	// Login to registries before pulling images
 	if (operation === 'up' || operation === 'pull') {
-		await loginToRegistries(dockerHost, logPrefix, spawnEnv.DOCKER_API_VERSION);
+		await loginToRegistries(dockerHost, logPrefix, spawnEnv.DOCKER_API_VERSION,
+			tlsCertDir ? { certDir: tlsCertDir, skipVerify: tlsConfig?.skipVerify } : undefined);
 	}
 
 	try {
@@ -2414,12 +2427,27 @@ export async function redeployStackFromDir(
 	}
 	const envPath = join(stackDir, '.env');
 	const hasEnv = existsSync(envPath);
-	const envVars = hasEnv ? parseEnvFileContent(readFileSync(envPath, 'utf-8'), stackName) : undefined;
+	const envFileContent = hasEnv ? readFileSync(envPath, 'utf-8') : undefined;
+	let envVars = envFileContent ? parseEnvFileContent(envFileContent, stackName) : undefined;
 	// Secret env vars are stored encrypted in the DB and deliberately never written
 	// to the snapshot's .env, so the extracted dir has no copy of them. Load them
 	// from the DB and inject them like every other compose path does (#1329) —
 	// otherwise a restored stack comes up with its secrets interpolating to "".
-	const secretVars = await getSecretEnvVarsAsRecord(stackName, envId);
+	let secretVars = await getSecretEnvVarsAsRecord(stackName, envId);
+	// Resolve provider references (op://, keepass://, azurekv://, pass://, bulk pull) the
+	// same way the start/restart/deploy paths do - this path loaded raw DB secrets, so a
+	// secret-marked reference would otherwise reach the container as the literal string.
+	const source = await getStackSource(stackName, envId ?? undefined);
+	const resolved = await resolveProviderEnvVars(
+		{ ...(envVars ?? {}) },
+		{ ...secretVars },
+		`[Stack:${stackName}]`,
+		source?.secretProviderId,
+		envFileContent,
+		{ stackName, envId: envId ?? undefined }
+	);
+	envVars = resolved.dbNonSecretVars;
+	secretVars = resolved.secretVars;
 	// For Hawser, ship the entire tree (compose + include:d files + sidecars + .env).
 	const stackFiles = await readDirFilesAsMap(stackDir);
 	return await executeComposeCommand(

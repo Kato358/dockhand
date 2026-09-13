@@ -2,7 +2,7 @@
  * Production Server Wrapper
  *
  * Wraps @sveltejs/adapter-node's output with WebSocket support for:
- * - Terminal exec connections (xterm.js ↔ Docker exec)
+ * - Terminal connections (xterm.js ↔ Docker exec/attach)
  * - Hawser Edge agent connections
  *
  * Usage: node ./server.js
@@ -153,8 +153,16 @@ globalThis.__terminalHandleExecMessage = (msg) => {
 	}
 
 	if (msg.type === 'exec_output') {
-		const data = Buffer.from(msg.data, 'base64').toString('utf-8');
-		session.ws.send(JSON.stringify({ type: 'output', data }));
+		const bytes = Buffer.from(msg.data, 'base64');
+		// Attach sessions carry a stream state: demultiplex non-TTY frames before
+		// forwarding. Exec sessions are raw TTY text and pass straight through.
+		if (session.streamState) {
+			for (const text of processDockerStreamChunk(bytes, session.streamState)) {
+				if (text) session.ws.send(JSON.stringify({ type: 'output', data: text }));
+			}
+		} else {
+			session.ws.send(JSON.stringify({ type: 'output', data: bytes.toString('utf-8') }));
+		}
 		return;
 	}
 
@@ -235,11 +243,139 @@ wss.on('connection', (ws, req) => {
  * - __terminalGetTarget(envId) - resolves connection info from environment
  * - __terminalCreateExec(containerId, shell, user, envId) - creates exec via Docker API
  * - __terminalResizeExec(execId, cols, rows, envId) - resizes exec terminal
+ * - __terminalGetContainerTty(containerId, envId) - reads the container TTY setting
+ * - __terminalResizeContainer(containerId, cols, rows, envId) - resizes an attached TTY
  */
+
+// NOTE: createDockerStreamState/decodeChunkedDockerBody/processDockerStreamChunk below
+// mirror src/lib/server/docker-stream-core.ts (the tested source of truth). server.js
+// runs against ./build and cannot import the TS core at runtime, so the logic is kept
+// inline here; keep the two in sync (vite.config.ts imports the core directly).
+function buildDockerStreamRequest(path, target, body = '') {
+	const host = target.host || 'localhost';
+	const tokenHeader = target.hawserToken ? `X-Hawser-Token: ${target.hawserToken}\r\n` : '';
+	return (
+		`POST ${path} HTTP/1.1\r\n` +
+		`Host: ${host}\r\n` +
+		`Content-Type: application/json\r\n` +
+		`${tokenHeader}` +
+		`Connection: Upgrade\r\n` +
+		`Upgrade: tcp\r\n` +
+		`Content-Length: ${Buffer.byteLength(body)}\r\n` +
+		`\r\n` +
+		body
+	);
+}
+
+function createDockerStreamState(multiplexed = false) {
+	return {
+		headersStripped: false,
+		isChunked: false,
+		headerBuffer: Buffer.alloc(0),
+		chunkBuffer: Buffer.alloc(0),
+		chunkSize: null,
+		chunkEnded: false,
+		multiplexed,
+		streamBuffer: Buffer.alloc(0)
+	};
+}
+
+function decodeChunkedDockerBody(data, state) {
+	state.chunkBuffer = Buffer.concat([state.chunkBuffer, data]);
+	const chunks = [];
+
+	while (!state.chunkEnded) {
+		if (state.chunkSize === null) {
+			const lineEnd = state.chunkBuffer.indexOf('\r\n');
+			if (lineEnd < 0) break;
+
+			const sizeText = state.chunkBuffer.slice(0, lineEnd).toString('ascii').split(';', 1)[0];
+			const size = parseInt(sizeText, 16);
+			if (!Number.isFinite(size) || size < 0) {
+				state.chunkEnded = true;
+				chunks.push(state.chunkBuffer);
+				state.chunkBuffer = Buffer.alloc(0);
+				break;
+			}
+
+			state.chunkBuffer = state.chunkBuffer.slice(lineEnd + 2);
+			state.chunkSize = size;
+			if (size === 0) {
+				state.chunkEnded = true;
+				state.chunkBuffer = Buffer.alloc(0);
+				break;
+			}
+		}
+
+		if (state.chunkBuffer.length < state.chunkSize + 2) break;
+		chunks.push(state.chunkBuffer.slice(0, state.chunkSize));
+		state.chunkBuffer = state.chunkBuffer.slice(state.chunkSize + 2);
+		state.chunkSize = null;
+	}
+
+	return chunks;
+}
+
+function processDockerStreamChunk(data, state) {
+	let buffer = Buffer.isBuffer(data) ? data : Buffer.from(data);
+	if (!state.headersStripped) {
+		state.headerBuffer = Buffer.concat([state.headerBuffer, buffer]);
+		const headerEnd = state.headerBuffer.indexOf('\r\n\r\n');
+		if (headerEnd < 0) return [];
+
+		const headers = state.headerBuffer.slice(0, headerEnd).toString('ascii').toLowerCase();
+		state.isChunked = headers.includes('transfer-encoding: chunked');
+		buffer = state.headerBuffer.slice(headerEnd + 4);
+		state.headerBuffer = Buffer.alloc(0);
+		state.headersStripped = true;
+	}
+
+	const bodyChunks = state.isChunked ? decodeChunkedDockerBody(buffer, state) : [buffer];
+	const output = [];
+	for (const body of bodyChunks) {
+		if (!body.length) continue;
+		if (!state.multiplexed) {
+			output.push(body.toString('utf-8'));
+			continue;
+		}
+
+		state.streamBuffer = Buffer.concat([state.streamBuffer, body]);
+		while (state.streamBuffer.length > 0) {
+			if (state.streamBuffer.length < 8) break;
+
+			const streamType = state.streamBuffer.readUInt8(0);
+			const frameSize = state.streamBuffer.readUInt32BE(4);
+			if (
+				streamType > 2 ||
+				state.streamBuffer[1] !== 0 ||
+				state.streamBuffer[2] !== 0 ||
+				state.streamBuffer[3] !== 0 ||
+				frameSize > 10 * 1024 * 1024
+			) {
+				// TTY output is normally raw. Fall back to raw output if a Docker
+				// proxy did not preserve the expected multiplexed framing.
+				output.push(state.streamBuffer.toString('utf-8'));
+				state.streamBuffer = Buffer.alloc(0);
+				state.multiplexed = false;
+				break;
+			}
+
+			if (state.streamBuffer.length < 8 + frameSize) break;
+			if (streamType === 1 || streamType === 2) {
+				output.push(state.streamBuffer.slice(8, 8 + frameSize).toString('utf-8'));
+			}
+			state.streamBuffer = state.streamBuffer.slice(8 + frameSize);
+		}
+	}
+
+	return output;
+}
+
 async function handleTerminalConnection(ws, url, connId) {
 	const pathParts = url.pathname.split('/');
 	const containerIdIndex = pathParts.indexOf('containers') + 1;
 	const containerId = pathParts[containerIdIndex];
+	const mode = url.searchParams.get('mode') === 'attach' ? 'attach' : 'exec';
 	const shell = url.searchParams.get('shell') || '/bin/sh';
 	const user = url.searchParams.get('user') || 'root';
 	const envIdParam = url.searchParams.get('envId');
@@ -251,7 +387,15 @@ async function handleTerminalConnection(ws, url, connId) {
 		return;
 	}
 
-	if (ws.__auth && typeof globalThis.__canAccessEnvForUser === 'function') {
+	// Fail closed: a terminal upgrade is rejected with 401 before it reaches here unless
+	// authenticated, so ws.__auth is always set. Assert it explicitly so the env/exec
+	// gates below never run on a null auth (never rely on the handshake invariant alone).
+	if (!ws.__auth) {
+		ws.close(1008, 'unauthenticated');
+		return;
+	}
+
+	if (typeof globalThis.__canAccessEnvForUser === 'function') {
 		try {
 			const ok = await globalThis.__canAccessEnvForUser(ws.__auth, envId);
 			if (!ok) {
@@ -268,7 +412,7 @@ async function handleTerminalConnection(ws, url, connId) {
 	}
 
 	// Opening a shell requires the containers:exec permission, same as the REST exec endpoint.
-	if (ws.__auth && typeof globalThis.__canExecForUser === 'function') {
+	if (typeof globalThis.__canExecForUser === 'function') {
 		try {
 			const allowed = await globalThis.__canExecForUser(ws.__auth, envId);
 			if (!allowed) {
@@ -294,23 +438,52 @@ async function handleTerminalConnection(ws, url, connId) {
 			target = { type: 'socket', connectionType: 'socket', socketPath: process.env.DOCKER_SOCKET || '/var/run/docker.sock' };
 		}
 
-		// Handle Hawser Edge mode - relay through agent WebSocket
+		// Hawser Edge relays exec and (for capable agents) attach through the agent.
 		if (target.connectionType === 'hawser-edge') {
-			handleEdgeExec(ws, connId, containerId, shell, user, target.environmentId);
+			let multiplexed = false;
+			if (mode === 'attach') {
+				let containerTty = false;
+				if (typeof globalThis.__terminalGetContainerTty === 'function') {
+					try {
+						containerTty = await globalThis.__terminalGetContainerTty(containerId, envId);
+					} catch {
+						// Keep multiplexing enabled if the TTY setting cannot be read.
+					}
+				}
+				multiplexed = !containerTty;
+			}
+			handleEdgeExec(ws, connId, containerId, shell, user, target.environmentId, mode, multiplexed);
 			return;
 		}
 
-		// Create exec instance via SvelteKit app (handles all connection types)
-		let execId;
-		if (typeof globalThis.__terminalCreateExec === 'function') {
-			execId = await globalThis.__terminalCreateExec(containerId, shell, user, envId);
+		let execId = null;
+		let streamPath;
+		let streamBody = '';
+		let multiplexed = false;
+		if (mode === 'attach') {
+			let containerTty = false;
+			if (typeof globalThis.__terminalGetContainerTty === 'function') {
+				try {
+					containerTty = await globalThis.__terminalGetContainerTty(containerId, envId);
+				} catch {
+					// Keep multiplexing enabled if the TTY setting cannot be read.
+				}
+			}
+			multiplexed = !containerTty;
+			streamPath = `/containers/${encodeURIComponent(containerId)}/attach?stream=1&stdin=1&stdout=1&stderr=1`;
 		} else {
-			// Fallback: create exec directly via local socket
-			execId = await createExecLocal(containerId, shell, user, target.socketPath || '/var/run/docker.sock');
+			// Create exec instance via SvelteKit app (handles all connection types)
+			if (typeof globalThis.__terminalCreateExec === 'function') {
+				execId = await globalThis.__terminalCreateExec(containerId, shell, user, envId);
+			} else {
+				// Fallback: create exec directly via local socket
+				execId = await createExecLocal(containerId, shell, user, target.socketPath || '/var/run/docker.sock');
+			}
+			streamPath = `/exec/${execId}/start`;
+			streamBody = JSON.stringify({ Detach: false, Tty: true });
 		}
 
-		// Open raw bidirectional stream to Docker for the exec session
-		const startBody = JSON.stringify({ Detach: false, Tty: true });
+		// Open raw bidirectional stream to Docker for the attach or exec session.
 		let dockerStream;
 
 		if (target.type === 'socket') {
@@ -333,45 +506,16 @@ async function handleTerminalConnection(ws, url, connId) {
 		}
 
 		dockerStream.on('connect', () => {
-			const host = target.host || 'localhost';
-			const tokenHeader = target.hawserToken ? `X-Hawser-Token: ${target.hawserToken}\r\n` : '';
-			dockerStream.write(
-				`POST /exec/${execId}/start HTTP/1.1\r\n` +
-				`Host: ${host}\r\n` +
-				`Content-Type: application/json\r\n` +
-				`${tokenHeader}` +
-				`Connection: Upgrade\r\n` +
-				`Upgrade: tcp\r\n` +
-				`Content-Length: ${Buffer.byteLength(startBody)}\r\n` +
-				`\r\n` +
-				startBody
-			);
+			dockerStream.write(buildDockerStreamRequest(streamPath, target, streamBody));
 		});
 
-		let headersStripped = false;
-		let isChunked = false;
+		const streamState = createDockerStreamState(multiplexed);
 
 		dockerStream.on('data', (data) => {
 			if (ws.readyState !== 1) return;
 
-			let text = data.toString('utf-8');
-			if (!headersStripped) {
-				if (text.toLowerCase().includes('transfer-encoding: chunked')) {
-					isChunked = true;
-				}
-				const headerEnd = text.indexOf('\r\n\r\n');
-				if (headerEnd > -1) {
-					text = text.slice(headerEnd + 4);
-					headersStripped = true;
-				} else if (text.startsWith('HTTP/')) {
-					return;
-				}
-			}
-			if (isChunked && text) {
-				text = text.replace(/^[0-9a-fA-F]+\r\n/gm, '').replace(/\r\n$/g, '');
-			}
-			if (text) {
-				ws.send(JSON.stringify({ type: 'output', data: text }));
+			for (const text of processDockerStreamChunk(data, streamState)) {
+				if (text) ws.send(JSON.stringify({ type: 'output', data: text }));
 			}
 		});
 
@@ -396,19 +540,34 @@ async function handleTerminalConnection(ws, url, connId) {
 				if (msg.type === 'input' && msg.data) {
 					dockerStream.write(msg.data);
 				} else if (msg.type === 'resize' && msg.cols && msg.rows) {
-					// Use SvelteKit's resize function if available (works for all connection types)
-					if (typeof globalThis.__terminalResizeExec === 'function') {
-						globalThis.__terminalResizeExec(execId, msg.cols, msg.rows, envId).catch(() => {});
+					if (mode === 'attach') {
+						if (typeof globalThis.__terminalResizeContainer === 'function') {
+							globalThis.__terminalResizeContainer(containerId, msg.cols, msg.rows, envId).catch(() => {});
+						} else if (target.type === 'socket') {
+							const socketPath = target.socketPath || '/var/run/docker.sock';
+							const resizeReq = httpRequest({
+								socketPath,
+								path: `/containers/${encodeURIComponent(containerId)}/resize?h=${msg.rows}&w=${msg.cols}`,
+								method: 'POST',
+							}, () => {});
+							resizeReq.on('error', () => {});
+							resizeReq.end();
+						}
 					} else {
-						// Fallback: resize via local socket
-						const socketPath = target.socketPath || '/var/run/docker.sock';
-						const resizeReq = httpRequest({
-							socketPath,
-							path: `/exec/${execId}/resize?h=${msg.rows}&w=${msg.cols}`,
-							method: 'POST',
-						}, () => {});
-						resizeReq.on('error', () => {});
-						resizeReq.end();
+						// Use SvelteKit's resize function if available (works for all connection types)
+						if (typeof globalThis.__terminalResizeExec === 'function') {
+							globalThis.__terminalResizeExec(execId, msg.cols, msg.rows, envId).catch(() => {});
+						} else {
+							// Fallback: resize via local socket
+							const socketPath = target.socketPath || '/var/run/docker.sock';
+							const resizeReq = httpRequest({
+								socketPath,
+								path: `/exec/${execId}/resize?h=${msg.rows}&w=${msg.cols}`,
+								method: 'POST',
+							}, () => {});
+							resizeReq.on('error', () => {});
+							resizeReq.end();
+						}
 					}
 				}
 			} catch {}
@@ -440,20 +599,27 @@ async function handleTerminalConnection(ws, url, connId) {
 }
 
 /**
- * Handle Hawser Edge exec session.
- * Sends exec commands through the Hawser WebSocket relay.
+ * Handle Hawser Edge exec or attach session.
+ * Sends exec/attach commands through the Hawser WebSocket relay. Attach reuses the
+ * exec_* protocol with attach:true; for non-TTY containers the agent pipes a
+ * multiplexed stream, demultiplexed here via the session's stream state.
  */
-function handleEdgeExec(ws, connId, containerId, shell, user, environmentId) {
+function handleEdgeExec(ws, connId, containerId, shell, user, environmentId, mode = 'exec', multiplexed = false) {
 	if (typeof globalThis.__hawserSendMessage !== 'function') {
 		ws.send(JSON.stringify({ type: 'error', message: 'Edge agent handler not ready' }));
 		ws.close();
 		return;
 	}
 
+	const attach = mode === 'attach';
 	const execId = randomUUID();
-	edgeExecSessions.set(execId, { ws, execId, environmentId });
+	// Attach output is a raw hijacked stream (no HTTP headers); only the multiplexing
+	// demux is needed, so seed the state with headersStripped already true.
+	const streamState = attach ? createDockerStreamState(multiplexed) : null;
+	if (streamState) streamState.headersStripped = true;
+	edgeExecSessions.set(execId, { ws, execId, environmentId, streamState });
 
-	// Send exec_start to the Hawser agent
+	// Send exec_start (attach:true reuses the exec relay) to the Hawser agent
 	const execStartMsg = JSON.stringify({
 		type: 'exec_start',
 		execId,
@@ -461,7 +627,8 @@ function handleEdgeExec(ws, connId, containerId, shell, user, environmentId) {
 		cmd: shell,
 		user,
 		cols: 120,
-		rows: 30
+		rows: 30,
+		attach
 	});
 
 	const sent = globalThis.__hawserSendMessage(environmentId, execStartMsg);

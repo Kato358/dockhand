@@ -7,6 +7,11 @@ import {
 	parseTimestamp,
 	type DateTimeFormatters
 } from '$lib/utils/date-format';
+import {
+	DEFAULT_STACK_LOG_OPERATIONS,
+	sanitizeStackLogOperations,
+	type StackLogOperation
+} from '$lib/utils/stack-log-operations';
 
 export type TimeFormat = '12h' | '24h';
 export type DateFormat = 'MM/DD/YYYY' | 'DD/MM/YYYY' | 'YYYY-MM-DD' | 'DD.MM.YYYY';
@@ -59,6 +64,7 @@ export interface AppSettings {
 	// Scanner Advanced settings (#1219). Empty values = use auto-detection.
 	defaultScannerNetworkMode: string;   // '' | 'host' | 'bridge' | 'none' | <custom-network>
 	defaultScannerDns: string[];         // ['1.1.1.1', '8.8.8.8']; empty = inherit
+	stackLogOperations: StackLogOperation[]; // stack ops that show the log popover (#1558)
 }
 
 const DEFAULT_SETTINGS: AppSettings = {
@@ -102,6 +108,7 @@ const DEFAULT_SETTINGS: AppSettings = {
 	protectScannerImages: true,
 	defaultScannerNetworkMode: '',
 	defaultScannerDns: [],
+	stackLogOperations: DEFAULT_STACK_LOG_OPERATIONS,
 	defaultComposeTemplate: `version: "3.8"
 
 services:
@@ -195,7 +202,8 @@ function createSettingsStore() {
 					showWhatsNew: settings.showWhatsNew ?? DEFAULT_SETTINGS.showWhatsNew,
 					protectScannerImages: settings.protectScannerImages ?? DEFAULT_SETTINGS.protectScannerImages,
 					defaultScannerNetworkMode: settings.defaultScannerNetworkMode ?? DEFAULT_SETTINGS.defaultScannerNetworkMode,
-					defaultScannerDns: Array.isArray(settings.defaultScannerDns) ? settings.defaultScannerDns : DEFAULT_SETTINGS.defaultScannerDns
+					defaultScannerDns: Array.isArray(settings.defaultScannerDns) ? settings.defaultScannerDns : DEFAULT_SETTINGS.defaultScannerDns,
+					stackLogOperations: sanitizeStackLogOperations(settings.stackLogOperations)
 				});
 			}
 		} catch {
@@ -257,7 +265,8 @@ function createSettingsStore() {
 					showWhatsNew: updatedSettings.showWhatsNew ?? DEFAULT_SETTINGS.showWhatsNew,
 					protectScannerImages: updatedSettings.protectScannerImages ?? DEFAULT_SETTINGS.protectScannerImages,
 					defaultScannerNetworkMode: updatedSettings.defaultScannerNetworkMode ?? DEFAULT_SETTINGS.defaultScannerNetworkMode,
-					defaultScannerDns: Array.isArray(updatedSettings.defaultScannerDns) ? updatedSettings.defaultScannerDns : DEFAULT_SETTINGS.defaultScannerDns
+					defaultScannerDns: Array.isArray(updatedSettings.defaultScannerDns) ? updatedSettings.defaultScannerDns : DEFAULT_SETTINGS.defaultScannerDns,
+					stackLogOperations: sanitizeStackLogOperations(updatedSettings.stackLogOperations)
 				});
 			}
 		} catch (error) {
@@ -289,6 +298,13 @@ function createSettingsStore() {
 				const newSettings = { ...current, confirmDestructive: value };
 				saveSettings({ confirmDestructive: value });
 				return newSettings;
+			});
+		},
+		setStackLogOperations: (value: StackLogOperation[]) => {
+			const clean = sanitizeStackLogOperations(value);
+			update((current) => {
+				saveSettings({ stackLogOperations: clean });
+				return { ...current, stackLogOperations: clean };
 			});
 		},
 		setShowStoppedContainers: (value: boolean) => {

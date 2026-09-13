@@ -50,4 +50,17 @@ describe('getImageDiskUsageTotalSize', () => {
 			LayersSize: null
 		})).toBeNull();
 	});
+
+	// Reproduces the reporter's case: many images sharing one large base layer, so
+	// summing each image's virtual Size over-counts the shared data many times over.
+	// The aggregate (what `docker system df` shows as the Images SIZE) is the truth.
+	test('shared layers: aggregate is used, not the inflated per-image sum', () => {
+		const BASE = 9_000_000_000; // a ~9 GB base layer shared by every image
+		const images = Array.from({ length: 8 }, (_, i) => ({ Size: BASE + i * 100_000_000 }));
+		const summed = images.reduce((s, img) => s + img.Size, 0); // ~74 GB - the bug
+		const aggregate = BASE + 8 * 100_000_000;                   // ~9.8 GB - the truth
+
+		expect(getImageDiskUsageTotalSize({ LayersSize: aggregate, Images: images })).toBe(aggregate);
+		expect(summed).toBeGreaterThan(aggregate * 5); // the old sum was several times larger
+	});
 });

@@ -6,10 +6,13 @@
 	import { Loader2 } from 'lucide-svelte';
 	import type { Snippet } from 'svelte';
 	import { cn } from '$lib/utils';
+	import StackIcon from '$lib/components/StackIcon.svelte';
 
 	interface Props {
 		stackName: string;
 		envId: number | null;
+		/** The stack's icon value (custom/selfhst/lucide/null); shown in the header. */
+		stackIcon?: string | null;
 		disabled?: boolean;
 		side?: 'top' | 'bottom';
 		align?: 'start' | 'center' | 'end';
@@ -47,6 +50,7 @@
 	let {
 		stackName,
 		envId,
+		stackIcon = null,
 		disabled = false,
 		side = 'top',
 		align = 'end',
@@ -110,13 +114,16 @@
 		{/snippet}
 	</Popover.Trigger>
 	<Popover.Content
-		class="w-56 p-3 z-[200]"
+		class="w-72 p-3 z-[200]"
 		{side}
 		{align}
 		sideOffset={8}
 	>
 		<div class="space-y-3">
-			<p class="text-xs font-medium">Redeploy stack</p>
+			<p class="flex items-center gap-1.5 text-xs text-muted-foreground">
+				<StackIcon icon={stackIcon} {stackName} {envId} class="w-4 h-4 shrink-0" />
+				<span class="truncate">Redeploy stack <strong class="font-semibold text-foreground">{stackName}</strong></span>
+			</p>
 			<div class="space-y-2">
 				<label class="flex items-center gap-2 cursor-pointer">
 					<Checkbox bind:checked={pull} disabled={deploying} />

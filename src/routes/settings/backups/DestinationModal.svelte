@@ -57,7 +57,8 @@
 		loadingStats = true;
 		try {
 			const res = await fetch(`/api/backup/destinations/${destination.id}/task`, {
-				method: 'POST', headers: { 'Content-Type': 'application/json' },
+				// Accept: json runs the read synchronously so we get {success, stats}, not {jobId}.
+				method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
 				body: JSON.stringify({ task: 'stats' })
 			});
 			const data = await res.json();

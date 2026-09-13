@@ -3,11 +3,13 @@
 	import { toast } from 'svelte-sonner';
 	import { Loader2, FolderOpen, RotateCcw, Trash2, ArrowLeftRight, HardDrive, Archive, RefreshCw } from 'lucide-svelte';
 	import ConfirmPopover from '$lib/components/ConfirmPopover.svelte';
+	import { Checkbox } from '$lib/components/ui/checkbox';
 	import { LoadingState } from '$lib/components/ui/loading-state';
 	import { formatDateTime, formatRelativeTime } from '$lib/stores/settings';
 	import { formatBytes } from '$lib/utils/format';
 	import { readJobResponse } from '$lib/utils/sse-fetch';
-	import { getRepoTypeIcon, selectOwnSnapshotsFromDestination } from '$lib/utils/backup';
+	import { getRepoTypeIcon, selectOwnSnapshotsFromDestination, bulkDeleteSnapshots, bulkDeleteToast } from '$lib/utils/backup';
+	import BulkDeleteSnapshotsDialog from '$lib/components/BulkDeleteSnapshotsDialog.svelte';
 	import SnapshotBrowser from './SnapshotBrowser.svelte';
 	import RestoreModal from './RestoreModal.svelte';
 	import SnapshotDiffModal from '../backups/SnapshotDiffModal.svelte';
@@ -49,6 +51,12 @@
 	let snapshots = $state<Snapshot[]>([]);
 	let deletingSnapshot = $state<string | null>(null);
 	let confirmDeleteSnapshot = $state<string | null>(null);
+	// Multi-select for bulk delete (same Set model as the containers grid), keyed by
+	// snapshot id. Bulk delete groups by destination and calls the batch endpoint.
+	let selectedSnapshots = $state<Set<string>>(new Set());
+	let bulkDeleting = $state(false);
+	let bulkDialogOpen = $state(false);
+	let bulkScope = $state<'selected' | 'all'>('selected');
 	// snapshotId → { filesNew, filesChanged, dataAdded } from schedule executions.
 	let stats = $state<Map<string, { filesNew: number; filesChanged: number; dataAdded: number }>>(new Map());
 
@@ -86,6 +94,16 @@
 	const visibleSnapshots = $derived(
 		repoFilter == null ? snapshots : snapshots.filter((s) => s._destinationId === repoFilter)
 	);
+	// Selection is scoped to what's currently visible (respects the repo filter), like the
+	// containers grid's select-all only covering the filtered rows.
+	const allVisibleSelected = $derived(
+		visibleSnapshots.length > 0 && visibleSnapshots.every((s) => selectedSnapshots.has(s.id))
+	);
+	const someVisibleSelected = $derived(
+		visibleSnapshots.some((s) => selectedSnapshots.has(s.id)) && !allVisibleSelected
+	);
+	const selectedCount = $derived(visibleSnapshots.filter((s) => selectedSnapshots.has(s.id)).length);
+
 	// A dropped repo filter (e.g. after a delete removed the last snapshot of a repo)
 	// falls back to "all" so the list never shows an empty filtered view.
 	$effect(() => {
@@ -213,6 +231,38 @@
 		}
 	}
 
+	function toggleSnapshot(id: string) {
+		const next = new Set(selectedSnapshots);
+		if (next.has(id)) next.delete(id); else next.add(id);
+		selectedSnapshots = next;
+	}
+	function toggleSelectAllVisible() {
+		const next = new Set(selectedSnapshots);
+		if (allVisibleSelected) for (const s of visibleSnapshots) next.delete(s.id);
+		else for (const s of visibleSnapshots) next.add(s.id);
+		selectedSnapshots = next;
+	}
+
+	// Bulk delete via the shared helper (groups by destination, one restic forget per repo).
+	// `scope` = the currently-selected snapshots, or ALL visible ones.
+	async function bulkDelete(scope: 'selected' | 'all') {
+		const targets = scope === 'all' ? visibleSnapshots : visibleSnapshots.filter((s) => selectedSnapshots.has(s.id));
+		if (targets.length === 0) return;
+		bulkDeleting = true;
+		try {
+			const result = await bulkDeleteSnapshots(targets);
+			const t = bulkDeleteToast(result);
+			toast[t.type](t.message);
+			selectedSnapshots = new Set();
+			await loadSnapshots();
+		} finally {
+			bulkDeleting = false;
+			bulkDialogOpen = false;
+		}
+	}
+	function openBulk(scope: 'selected' | 'all') { bulkScope = scope; bulkDialogOpen = true; }
+	const bulkCount = $derived(bulkScope === 'all' ? visibleSnapshots.length : selectedCount);
+
 	// `hasBackups` arrives from the parent AFTER this panel mounts (the parent
 	// fetches its configs async), so it starts false and flips true once configs
 	// load. A plain onMount would run with hasBackups=false and early-return,
@@ -277,10 +327,27 @@
 			{/each}
 		</div>
 	{/if}
+	<!-- Bulk actions: delete the selected snapshots, or all in the current view. -->
+	<div class="mb-2 flex items-center gap-2">
+		{#if selectedCount > 0}
+			<button type="button" class="inline-flex items-center gap-1.5 rounded-md border border-destructive/40 px-2.5 py-1 text-xs text-destructive transition-colors hover:bg-destructive/10" onclick={() => openBulk('selected')}>
+				<Trash2 class="h-3 w-3" /> Delete selected ({selectedCount})
+			</button>
+			<button type="button" class="text-xs text-muted-foreground hover:text-foreground" onclick={() => (selectedSnapshots = new Set())}>Clear</button>
+		{/if}
+		{#if visibleSnapshots.length > 0}
+			<button type="button" class="ml-auto inline-flex items-center gap-1.5 rounded-md border border-destructive/40 px-2.5 py-1 text-xs text-destructive transition-colors hover:bg-destructive/10" onclick={() => openBulk('all')}>
+				<Trash2 class="h-3 w-3" /> Delete all ({visibleSnapshots.length})
+			</button>
+		{/if}
+	</div>
 	<div class="overflow-x-auto">
 		<table class="w-full text-xs">
 			<thead>
 				<tr class="border-b text-left text-muted-foreground">
+					<th class="w-8 py-1.5 pl-2">
+						<Checkbox checked={allVisibleSelected} indeterminate={someVisibleSelected} onCheckedChange={toggleSelectAllVisible} aria-label="Select all snapshots" />
+					</th>
 					<th class="py-1.5 pl-2 font-medium">Snapshot</th>
 					<th class="py-1.5 pl-2 font-medium">Taken</th>
 					<th class="py-1.5 pl-2 font-medium">Added</th>
@@ -293,7 +360,10 @@
 					{@const isDiffPending = diffPending?.id === s.id}
 					{@const RepoIcon = getRepoTypeIcon(s._destinationRepository)}
 					{@const st = stats.get(s.id)}
-					<tr class="border-b text-xs last:border-0 hover:bg-muted/30 {isDiffPending ? 'bg-primary/10' : ''}">
+					<tr class="border-b text-xs last:border-0 hover:bg-muted/30 {isDiffPending ? 'bg-primary/10' : ''} {selectedSnapshots.has(s.id) ? 'bg-primary/5' : ''}">
+						<td class="py-1.5 pl-2">
+							<Checkbox checked={selectedSnapshots.has(s.id)} onCheckedChange={() => toggleSnapshot(s.id)} aria-label="Select snapshot {s.shortId}" />
+						</td>
 						<td class="py-1.5 pl-2 font-mono text-muted-foreground">{s.shortId}</td>
 						<td class="py-1.5 pl-2">{formatDateTime(s.time)} <span class="text-muted-foreground opacity-60">({formatRelativeTime(s.time)})</span></td>
 						<td class="py-1.5 pl-2 text-muted-foreground" title={st ? `${st.filesNew} new, ${st.filesChanged} changed files` : ''}>{st ? formatBytes(st.dataAdded) : '—'}</td>
@@ -339,6 +409,8 @@
 		</table>
 	</div>
 {/if}
+
+<BulkDeleteSnapshotsDialog bind:open={bulkDialogOpen} count={bulkCount} busy={bulkDeleting} onConfirm={() => bulkDelete(bulkScope)} />
 
 <SnapshotBrowser
 	bind:open={showBrowser}

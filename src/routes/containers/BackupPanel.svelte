@@ -23,6 +23,7 @@
 	import { formatDateTime } from '$lib/stores/settings';
 	import { watchJob } from '$lib/utils/sse-fetch';
 	import ConfirmPopover from '$lib/components/ConfirmPopover.svelte';
+	import { Checkbox } from '$lib/components/ui/checkbox';
 	import { getRepoTypeIcon, parseRetention, parseOptions, retentionSummary as getRetentionSummary, formatCron, runBackupAction, classifyJobResult, tagLogLine, fetchBackupExecutions, type BackupAction, type BackupFormState } from '$lib/utils/backup';
 	import { reconcileSelectedVolumeKeys } from '$lib/utils/mounts';
 
@@ -90,6 +91,8 @@
 	let loading = $state(true);
 	let runningBackup = $state<number | null>(null);
 	let confirmDeleteId = $state<number | null>(null);
+	// Opt-in: also forget the config's snapshots on delete (off by default; resets per open).
+	let deleteConfigSnapshots = $state(false);
 
 	// Edit form state
 	let editingConfig = $state<BackupConfig | null>(null);
@@ -393,10 +396,13 @@
 	}
 
 	async function deleteConfig(id: number) {
+		const withSnaps = deleteConfigSnapshots;
 		try {
-			const res = await fetch(`/api/backup/configs/${id}`, { method: 'DELETE' });
+			const res = await fetch(`/api/backup/configs/${id}${withSnaps ? '?deleteSnapshots=true' : ''}`, { method: 'DELETE' });
 			if (res.ok) {
-				toast.success('Backup schedule removed');
+				const data = await res.json().catch(() => ({}));
+				const n = data.snapshots?.deleted ?? 0;
+				toast.success(`Backup schedule removed${withSnaps ? ` (${n} snapshot${n === 1 ? '' : 's'} deleted)` : ''}`);
 				fetchConfigs();
 				onConfigSaved?.();
 			} else {
@@ -404,6 +410,7 @@
 			}
 		} catch { toast.error('Failed to delete'); }
 		confirmDeleteId = null;
+		deleteConfigSnapshots = false;
 	}
 
 	// Pause/resume a scheduled backup. A minimal PUT with only `enabled` is a
@@ -616,13 +623,19 @@
 						action="Delete"
 						itemType="backup schedule"
 						itemName={dest?.name || ''}
-						title="Remove schedule"
+						title={deleteConfigSnapshots ? 'Snapshots will be deleted too.' : 'Remove schedule (snapshots are kept)'}
 						position="left"
 						onConfirm={() => deleteConfig(cfg.id)}
-						onOpenChange={(open) => confirmDeleteId = open ? cfg.id : null}
+						onOpenChange={(open) => { confirmDeleteId = open ? cfg.id : null; if (open) deleteConfigSnapshots = false; }}
 					>
 						{#snippet children({ open })}
 							<Trash2 class="w-3 h-3 {open ? 'text-destructive' : 'text-muted-foreground hover:text-destructive'}" />
+						{/snippet}
+						{#snippet extraContent()}
+							<label class="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
+								<Checkbox bind:checked={deleteConfigSnapshots} aria-label="Also delete snapshots" />
+								Also delete this config's snapshots
+							</label>
 						{/snippet}
 					</ConfirmPopover>
 				</div>

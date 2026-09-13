@@ -40,6 +40,7 @@ import { refreshSystemJobs } from '$lib/server/scheduler';
 import { sendToEventSubprocess, sendToMetricsSubprocess } from '$lib/server/subprocess-manager';
 import { DEFAULT_GRYPE_IMAGE, DEFAULT_TRIVY_IMAGE } from '$lib/server/scanner';
 import { DEFAULT_HELPER_IMAGE } from '$lib/server/backups/restic';
+import { DEFAULT_STACK_LOG_OPERATIONS, sanitizeStackLogOperations, parseStackLogOperationsStorage, type StackLogOperation } from '$lib/utils/stack-log-operations';
 
 // The real engine default (version-pinned, `-baseline`-aware). NOT a hardcoded
 // `:latest` — that would advertise a floating tag the backup engine never uses and,
@@ -132,6 +133,8 @@ export interface GeneralSettings {
 	// Scanner Advanced settings (#1219). Empty = use auto-detection.
 	defaultScannerNetworkMode: string;
 	defaultScannerDns: string[];
+	// Stack operations that show the full compose-log popover (#1558).
+	stackLogOperations: StackLogOperation[];
 }
 
 const DEFAULT_SETTINGS: Omit<GeneralSettings, 'scheduleRetentionDays' | 'eventRetentionDays' | 'scheduleCleanupCron' | 'eventCleanupCron' | 'scheduleCleanupEnabled' | 'eventCleanupEnabled' | 'scannerCleanupCron' | 'scannerCleanupEnabled' | 'deployLogReconcileCron' | 'deployLogReconcileEnabled'> = {
@@ -176,6 +179,7 @@ const DEFAULT_SETTINGS: Omit<GeneralSettings, 'scheduleRetentionDays' | 'eventRe
 	protectScannerImages: true,
 	defaultScannerNetworkMode: '',
 	defaultScannerDns: [],
+	stackLogOperations: DEFAULT_STACK_LOG_OPERATIONS,
 	defaultComposeTemplate: `version: "3.8"
 
 services:
@@ -293,7 +297,8 @@ export const GET: RequestHandler = async ({ cookies }) => {
 			editorIndentGuides,
 			protectScannerImages,
 			defaultScannerNetworkMode,
-			defaultScannerDnsRaw
+			defaultScannerDnsRaw,
+			stackLogOperationsRaw
 		] = await Promise.all([
 			getSetting('confirm_destructive'),
 			getSetting('show_stopped_containers'),
@@ -347,7 +352,8 @@ export const GET: RequestHandler = async ({ cookies }) => {
 			getSetting('editor_indent_guides'),
 			getSetting('protect_scanner_images'),
 			getSetting('default_scanner_network_mode'),
-			getSetting('default_scanner_dns')
+			getSetting('default_scanner_dns'),
+			getSetting('stack_log_operations')
 		]);
 
 		const settings: GeneralSettings = {
@@ -405,7 +411,8 @@ export const GET: RequestHandler = async ({ cookies }) => {
 			editorIndentGuides: editorIndentGuides ?? DEFAULT_SETTINGS.editorIndentGuides,
 			protectScannerImages: protectScannerImages ?? DEFAULT_SETTINGS.protectScannerImages,
 			defaultScannerNetworkMode: defaultScannerNetworkMode ?? DEFAULT_SETTINGS.defaultScannerNetworkMode,
-			defaultScannerDns: parseScannerDnsStorage(defaultScannerDnsRaw)
+			defaultScannerDns: parseScannerDnsStorage(defaultScannerDnsRaw),
+			stackLogOperations: parseStackLogOperationsStorage(stackLogOperationsRaw)
 		};
 
 		return json(settings);
@@ -419,7 +426,7 @@ export const GET: RequestHandler = async ({ cookies }) => {
  * @openapi
  * summary: Update global general settings (all fields optional; only supplied keys are written)
  * description: A large flat settings bag - theme/fonts, scanner defaults, cleanup schedules, event/metrics collection, editor options (e.g. editorIndentGuides), and more.
- * body: {animateIcons:boolean, editorIndentGuides:boolean, coloredActionButtons:boolean, lightTheme:string, darkTheme:string, defaultTimezone:string, logBufferSizeKb:integer, externalStackPaths:string, actionIconSize:string, compactPorts:boolean, confirmDestructive:boolean, dateFormat:string, defaultBackupImage:string, defaultComposeTemplate:string, defaultGrypeArgs:string, defaultGrypeImage:string, defaultScannerDns:array<string>, defaultScannerNetworkMode:string, defaultTrivyArgs:string, defaultTrivyImage:string, deployLogReconcileCron:string, deployLogReconcileEnabled:boolean, downloadFormat:string, editorFont:string, eventCleanupCron:string, eventCleanupEnabled:boolean, eventCollectionMode:string, eventPollInterval:integer, eventRetentionDays:integer, font:string, fontSize:string, formatLogTimestamps:boolean, gridFontSize:string, highlightUpdates:boolean, honorProxyLabels:boolean, labelFilterMode:string, logMaxLines:integer, metricsCollectionInterval:integer, primaryStackLocation:string, protectScannerImages:boolean, scannerCleanupCron:string, scannerCleanupEnabled:boolean, scheduleCleanupCron:string, scheduleCleanupEnabled:boolean, scheduleRetentionDays:integer, showExposedPorts:boolean, showGitCommitHash:boolean, showImageChangelogLinks:boolean, showStoppedContainers:boolean, showWhatsNew:boolean, terminalFont:string, timeFormat:string, useSelfhstIcons:boolean}
+ * body: {animateIcons:boolean, editorIndentGuides:boolean, coloredActionButtons:boolean, lightTheme:string, darkTheme:string, defaultTimezone:string, logBufferSizeKb:integer, externalStackPaths:string, actionIconSize:string, compactPorts:boolean, confirmDestructive:boolean, dateFormat:string, defaultBackupImage:string, defaultComposeTemplate:string, defaultGrypeArgs:string, defaultGrypeImage:string, defaultScannerDns:array<string>, defaultScannerNetworkMode:string, defaultTrivyArgs:string, defaultTrivyImage:string, deployLogReconcileCron:string, deployLogReconcileEnabled:boolean, downloadFormat:string, editorFont:string, eventCleanupCron:string, eventCleanupEnabled:boolean, eventCollectionMode:string, eventPollInterval:integer, eventRetentionDays:integer, font:string, fontSize:string, formatLogTimestamps:boolean, gridFontSize:string, highlightUpdates:boolean, honorProxyLabels:boolean, labelFilterMode:string, logMaxLines:integer, metricsCollectionInterval:integer, primaryStackLocation:string, protectScannerImages:boolean, scannerCleanupCron:string, scannerCleanupEnabled:boolean, scheduleCleanupCron:string, scheduleCleanupEnabled:boolean, scheduleRetentionDays:integer, showExposedPorts:boolean, showGitCommitHash:boolean, showImageChangelogLinks:boolean, showStoppedContainers:boolean, showWhatsNew:boolean, terminalFont:string, timeFormat:string, useSelfhstIcons:boolean, stackLogOperations:array<string>}
  * resp-403: Permission denied (needs settings:edit)
  * resp-500: Failed to save settings
  */
@@ -431,7 +438,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 
 	try {
 		const body = await request.json();
-		const { confirmDestructive, showStoppedContainers, highlightUpdates, coloredActionButtons, actionIconSize, timeFormat, dateFormat, downloadFormat, defaultGrypeArgs, defaultTrivyArgs, scheduleRetentionDays, eventRetentionDays, scheduleCleanupCron, eventCleanupCron, scheduleCleanupEnabled, eventCleanupEnabled, scannerCleanupCron, scannerCleanupEnabled, deployLogReconcileCron, deployLogReconcileEnabled, logBufferSizeKb, logMaxLines, defaultTimezone, eventCollectionMode, eventPollInterval, metricsCollectionInterval, lightTheme, darkTheme, font, fontSize, gridFontSize, terminalFont, editorFont, compactPorts, showExposedPorts, showGitCommitHash, formatLogTimestamps, externalStackPaths, primaryStackLocation, defaultGrypeImage, defaultTrivyImage, defaultComposeTemplate, labelFilterMode, defaultBackupImage, honorProxyLabels, showImageChangelogLinks, useSelfhstIcons, animateIcons, editorIndentGuides, protectScannerImages, showWhatsNew, defaultScannerNetworkMode, defaultScannerDns } = body;
+		const { confirmDestructive, showStoppedContainers, highlightUpdates, coloredActionButtons, actionIconSize, timeFormat, dateFormat, downloadFormat, defaultGrypeArgs, defaultTrivyArgs, scheduleRetentionDays, eventRetentionDays, scheduleCleanupCron, eventCleanupCron, scheduleCleanupEnabled, eventCleanupEnabled, scannerCleanupCron, scannerCleanupEnabled, deployLogReconcileCron, deployLogReconcileEnabled, logBufferSizeKb, logMaxLines, defaultTimezone, eventCollectionMode, eventPollInterval, metricsCollectionInterval, lightTheme, darkTheme, font, fontSize, gridFontSize, terminalFont, editorFont, compactPorts, showExposedPorts, showGitCommitHash, formatLogTimestamps, externalStackPaths, primaryStackLocation, defaultGrypeImage, defaultTrivyImage, defaultComposeTemplate, labelFilterMode, defaultBackupImage, honorProxyLabels, showImageChangelogLinks, useSelfhstIcons, animateIcons, editorIndentGuides, protectScannerImages, showWhatsNew, defaultScannerNetworkMode, defaultScannerDns, stackLogOperations } = body;
 
 		if (confirmDestructive !== undefined) {
 			await setSetting('confirm_destructive', confirmDestructive);
@@ -626,6 +633,10 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 				.slice(0, 10); // sane upper bound; Docker accepts more but no one needs it
 			await setSetting('default_scanner_dns', JSON.stringify(cleaned));
 		}
+		if (stackLogOperations !== undefined && Array.isArray(stackLogOperations)) {
+			// Store the sanitized list verbatim; an empty array is a valid "log nothing" choice.
+			await setSetting('stack_log_operations', JSON.stringify(sanitizeStackLogOperations(stackLogOperations)));
+		}
 
 		// Fetch all settings in parallel for the response
 		const [
@@ -647,6 +658,8 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 			eventCleanupEnabledVal,
 			scannerCleanupCronVal,
 			scannerCleanupEnabledVal,
+			deployLogReconcileCronVal,
+			deployLogReconcileEnabledVal,
 			logBufferSizeKbVal,
 			logMaxLinesVal,
 			defaultTimezoneVal,
@@ -679,7 +692,8 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 			editorIndentGuidesVal,
 			protectScannerImagesVal,
 			defaultScannerNetworkModeVal,
-			defaultScannerDnsRawVal
+			defaultScannerDnsRawVal,
+			stackLogOperationsRawVal
 		] = await Promise.all([
 			getSetting('confirm_destructive'),
 			getSetting('show_stopped_containers'),
@@ -699,6 +713,8 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 			getEventCleanupEnabled(),
 			getScannerCleanupCron(),
 			getScannerCleanupEnabled(),
+			getDeployLogReconcileCron(),
+			getDeployLogReconcileEnabled(),
 			getSetting('log_buffer_size_kb'),
 			getSetting('log_max_lines'),
 			getDefaultTimezone(),
@@ -731,7 +747,8 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 			getSetting('editor_indent_guides'),
 			getSetting('protect_scanner_images'),
 			getSetting('default_scanner_network_mode'),
-			getSetting('default_scanner_dns')
+			getSetting('default_scanner_dns'),
+			getSetting('stack_log_operations')
 		]);
 
 		const settings: GeneralSettings = {
@@ -753,6 +770,8 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 			eventCleanupEnabled: eventCleanupEnabledVal,
 			scannerCleanupCron: scannerCleanupCronVal,
 			scannerCleanupEnabled: scannerCleanupEnabledVal,
+			deployLogReconcileCron: deployLogReconcileCronVal,
+			deployLogReconcileEnabled: deployLogReconcileEnabledVal,
 			logBufferSizeKb: logBufferSizeKbVal ?? DEFAULT_SETTINGS.logBufferSizeKb,
 			logMaxLines: (typeof logMaxLinesVal === 'number' && logMaxLinesVal > 0)
 				? Math.min(2000, Math.max(100, logMaxLinesVal))
@@ -787,7 +806,8 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 			animateIcons: animateIconsVal ?? DEFAULT_SETTINGS.animateIcons,
 			editorIndentGuides: editorIndentGuidesVal ?? DEFAULT_SETTINGS.editorIndentGuides,
 			defaultScannerNetworkMode: defaultScannerNetworkModeVal ?? DEFAULT_SETTINGS.defaultScannerNetworkMode,
-			defaultScannerDns: parseScannerDnsStorage(defaultScannerDnsRawVal)
+			defaultScannerDns: parseScannerDnsStorage(defaultScannerDnsRawVal),
+			stackLogOperations: parseStackLogOperationsStorage(stackLogOperationsRawVal)
 		};
 
 		return json(settings);
