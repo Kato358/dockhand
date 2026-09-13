@@ -62,6 +62,8 @@ jobs:
         if: steps.commit.outputs.changed == 'true' || inputs.force_build == true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # 仓库里存在其他 remote 时，gh 会错误地解析到别的仓库，必须显式指定
+          GH_REPO: ${{ github.repository }}
         run: |
           gh workflow run docker-publish.yml --ref main -f ref=localized
           echo "已触发工作流 3（构建并发布镜像）"

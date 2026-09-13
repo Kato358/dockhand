@@ -71,6 +71,8 @@ jobs:
         if: steps.merge.outputs.synced == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # 仓库里存在 upstream remote 时，gh 会错误地解析到上游仓库，必须显式指定
+          GH_REPO: ${{ github.repository }}
         run: |
           gh workflow run localize.yml --ref main -f synced_from="${GITHUB_SHA::7}"
           echo "已触发工作流 2（汉化）"
