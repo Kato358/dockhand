@@ -1,0 +1,172 @@
+name: Build & publish Docker image
+
+# 工作流 3/3：从 localized 分支构建并发布 Docker 镜像。
+# 默认推送 GHCR（ghcr.io/<owner>/dockhand，用 GITHUB_TOKEN 即可）；
+# 若配置了 DOCKERHUB_USERNAME / DOCKERHUB_TOKEN 仓库 Secrets，
+# 会同时推送 docker.io/<DOCKERHUB_USERNAME>/dockhand。
+# 标签：<VERSION 文件内容>（如 v1.0.47）、latest；baseline 变体加 -baseline。
+#
+# 说明：本公开镜像仓库不含 package-lock.json（上游私有流水线才有），
+# 而 Dockerfile 会 COPY 它，所以构建前先用 npm 生成。
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: '要构建的分支'
+        default: 'localized'
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+
+jobs:
+  main-image:
+    name: Main image (amd64 + arm64)
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref || 'localized' }}
+
+      - name: Read version
+        id: ver
+        run: echo "version=$(head -n1 VERSION | tr -d '[:space:]')" >> "$GITHUB_OUTPUT"
+
+      - name: Compute GHCR image name (lowercase)
+        id: img
+        run: echo "name=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+
+      - name: Generate package-lock.json
+        if: ${{ hashFiles('package-lock.json') == '' }}
+        run: npm install --package-lock-only --no-audit --no-fund
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Log in to Docker Hub
+        if: env.DOCKERHUB_USERNAME != ''
+        uses: docker/login-action@v3
+        with:
+          registry: docker.io
+          username: ${{ env.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Compute tags
+        id: tags
+        env:
+          VERSION: ${{ steps.ver.outputs.version }}
+          IMAGE: ${{ steps.img.outputs.name }}
+        run: |
+          TAGS="${IMAGE}:${VERSION}
+          ${IMAGE}:latest"
+          if [ -n "$DOCKERHUB_USERNAME" ]; then
+            DH="docker.io/${DOCKERHUB_USERNAME,,}/dockhand"
+            TAGS="$TAGS
+          ${DH}:${VERSION}
+          ${DH}:latest"
+          fi
+          {
+            echo "tags<<EOF"
+            printf '%s\n' "$TAGS"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          provenance: false
+          tags: ${{ steps.tags.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  baseline-image:
+    name: Baseline image (amd64, old CPUs)
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref || 'localized' }}
+
+      - name: Read version
+        id: ver
+        run: echo "version=$(head -n1 VERSION | tr -d '[:space:]')" >> "$GITHUB_OUTPUT"
+
+      - name: Compute GHCR image name (lowercase)
+        id: img
+        run: echo "name=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+
+      - name: Generate package-lock.json
+        if: ${{ hashFiles('package-lock.json') == '' }}
+        run: npm install --package-lock-only --no-audit --no-fund
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Log in to Docker Hub
+        if: env.DOCKERHUB_USERNAME != ''
+        uses: docker/login-action@v3
+        with:
+          registry: docker.io
+          username: ${{ env.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Compute tags
+        id: tags
+        env:
+          VERSION: ${{ steps.ver.outputs.version }}
+          IMAGE: ${{ steps.img.outputs.name }}
+        run: |
+          TAGS="${IMAGE}:${VERSION}-baseline
+          ${IMAGE}:baseline"
+          if [ -n "$DOCKERHUB_USERNAME" ]; then
+            DH="docker.io/${DOCKERHUB_USERNAME,,}/dockhand"
+            TAGS="$TAGS
+          ${DH}:${VERSION}-baseline
+          ${DH}:baseline"
+          fi
+          {
+            echo "tags<<EOF"
+            printf '%s\n' "$TAGS"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile.baseline
+          platforms: linux/amd64
+          push: true
+          provenance: false
+          tags: ${{ steps.tags.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

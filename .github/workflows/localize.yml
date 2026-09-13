@@ -1,0 +1,67 @@
+name: Localize (zh-CN)
+
+# 工作流 2/3：应用中文汉化。
+# 每次都从 main 全新重建 localized 分支：先检出 main，再执行
+# l10n/apply.mjs 按 l10n/zh-CN.json 词典做精确字符串替换，
+# 有变化才提交并强推 localized，最后触发工作流 3（构建镜像）。
+# 翻译从不写回 main，因此与上游同步零冲突；词典过时只会在日志里提示。
+
+on:
+  workflow_dispatch:
+    inputs:
+      synced_from:
+        description: '触发来源（仅作记录）'
+        default: ''
+      force_build:
+        description: '即使汉化无变化也触发构建镜像'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  localize:
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.commit.outputs.changed }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Recreate localized branch from main
+        run: git checkout -B localized
+
+      - name: Apply zh-CN translations
+        run: node l10n/apply.mjs
+
+      - name: Commit and push localized branch
+        id: commit
+        env:
+          FORCE_BUILD: ${{ inputs.force_build }}
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git add -A
+            git commit -m "chore(l10n): apply zh-CN translations"
+            git push --force origin localized
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "源码无新增可翻译内容（词典已全部应用）。"
+          fi
+
+      - name: Trigger docker publish workflow
+        if: steps.commit.outputs.changed == 'true' || inputs.force_build == true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh workflow run docker-publish.yml --ref main -f ref=localized
+          echo "已触发工作流 3（构建并发布镜像）"
