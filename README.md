@@ -3,6 +3,32 @@
 </p>
 
 <p align="center">
+  <strong>Dockhand 中文汉化版</strong>
+</p>
+
+> [!NOTE]
+> 本仓库是 [Finsys/dockhand](https://github.com/Finsys/dockhand) 的**非官方中文汉化版**，通过 GitHub Actions 自动完成「同步上游 → 汉化 → 发布镜像」全流程，始终跟随上游最新版本。
+>
+> **使用方法**（界面为简体中文）：
+>
+> ```bash
+> docker run -d \
+>   --name dockhand \
+>   -p 3000:3000 \
+>   -v /var/run/docker.sock:/var/run/docker.sock \
+>   -v dockhand-data:/app/data \
+>   ghcr.io/kato358/dockhand-zh:latest
+> ```
+>
+> 其他标签：`v*`（跟随上游版本号）、`latest`、`baseline`（老 CPU 兼容版，仅 amd64）。也提供 `docker.io/kato358/dockhand-zh`。
+>
+> - 汉化方式与流水线说明见 [l10n/README.md](l10n/README.md)；翻译词条在 [l10n/zh-CN.json](l10n/zh-CN.json)，欢迎 PR 补充
+> - 汉化基于源码精确字符串替换（仅 UI 层 `*.svelte`），不改动任何服务端逻辑
+> - 以下是上游原版 README（英文）
+
+---
+
+<p align="center">
   <strong>Modern Docker Management UI</strong>
 </p>
 
