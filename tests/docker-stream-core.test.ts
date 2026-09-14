@@ -3,7 +3,8 @@ import { describe, expect, test } from 'bun:test';
 import {
 	createDockerStreamState,
 	decodeChunkedDockerBody,
-	processDockerStreamChunk
+	processDockerStreamChunk,
+	translateAttachInput
 } from '../src/lib/server/docker-stream-core';
 
 const HTTP_HEAD = 'HTTP/1.1 200 OK\r\nContent-Type: application/vnd.docker.raw-stream\r\n\r\n';
@@ -155,5 +156,34 @@ describe('processDockerStreamChunk - edge attach seeding (headersStripped, no HT
 		const f = frame(1, 'split');
 		expect(processDockerStreamChunk(f.subarray(0, 4), st)).toEqual([]);
 		expect(processDockerStreamChunk(f.subarray(4), st).join('')).toBe('split');
+	});
+});
+
+describe('translateAttachInput - CR to LF gated on non-TTY attach', () => {
+	// nonTtyAttach=true: attach to a container with no pty (the CR->LF case).
+	test('maps a lone carriage return (xterm Enter) to a newline', () => {
+		expect(translateAttachInput('ls\r', true)).toBe('ls\n');
+	});
+
+	test('leaves an existing CRLF alone (no doubled newline)', () => {
+		expect(translateAttachInput('a\r\nb', true)).toBe('a\r\nb');
+	});
+
+	test('translates multiple lone CRs', () => {
+		expect(translateAttachInput('one\rtwo\rthree\r', true)).toBe('one\ntwo\nthree\n');
+	});
+
+	test('passes plain text and bare LF through unchanged', () => {
+		expect(translateAttachInput('hello\n', true)).toBe('hello\n');
+		expect(translateAttachInput('no-eol', true)).toBe('no-eol');
+	});
+
+	// nonTtyAttach=false: exec or TTY attach - input MUST pass through verbatim,
+	// including a lone \r (the pty/exec handles line-ending itself). This guards the
+	// gate: a flipped call site would corrupt exec keystrokes and this would fail.
+	test('passes a lone CR through UNCHANGED for exec / TTY attach', () => {
+		expect(translateAttachInput('ls\r', false)).toBe('ls\r');
+		expect(translateAttachInput('\r', false)).toBe('\r');
+		expect(translateAttachInput('a\rb\rc', false)).toBe('a\rb\rc');
 	});
 });

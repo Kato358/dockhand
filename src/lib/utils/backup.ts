@@ -458,6 +458,9 @@ export interface BulkDeleteResult {
 	skipped: number;
 	/** true if any destination's batch call returned a non-2xx. */
 	failed: boolean;
+	/** Raw restic error from the first failing destination (repo locked, timeout, etc.),
+	 * surfaced verbatim so the user sees the real reason instead of a generic message. */
+	error?: string;
 }
 
 /**
@@ -469,7 +472,7 @@ export interface BulkDeleteResult {
 export async function bulkDeleteSnapshots(
 	targets: { id: string; _destinationId: number }[]
 ): Promise<BulkDeleteResult> {
-	let deleted = 0, skipped = 0, failed = false;
+	let deleted = 0, skipped = 0, failed = false, error: string | undefined;
 	for (const { destinationId, snapshotIds } of groupSnapshotIdsByDestination(targets)) {
 		try {
 			const res = await fetch('/api/backup/snapshots/batch-delete', {
@@ -480,17 +483,34 @@ export async function bulkDeleteSnapshots(
 			const data = await res.json().catch(() => ({}));
 			deleted += data.deleted?.length ?? 0;
 			if (res.ok) skipped += data.skipped?.length ?? 0;
-			else failed = true;
+			else {
+				failed = true;
+				if (!error && data.error) error = String(data.error);
+			}
 		} catch {
 			failed = true;
 		}
 	}
-	return { deleted, skipped, failed };
+	return { deleted, skipped, failed, error };
+}
+
+/**
+ * A hard restic failure that warrants the full-error dialog (repo locked, timeout,
+ * etc.) rather than a toast. Returns the raw restic error and how many were still
+ * deleted, or null when there is no such failure (toast handles success/skipped).
+ * A `failed` with no `error` (e.g. a thrown fetch) also returns null - nothing
+ * verbatim to show - so the caller falls back to the toast.
+ */
+export function bulkDeleteFailure(r: BulkDeleteResult): { error: string; deleted: number } | null {
+	if (r.failed && r.error) return { error: r.error, deleted: r.deleted };
+	return null;
 }
 
 /**
  * Consistent toast wording for a bulk-delete result, shared by every snapshot list.
  * Returns { type, message } so each caller fires its own toast (import stays local).
+ * A hard restic failure with a verbatim error is handled by the caller via
+ * bulkDeleteFailure + the error dialog, not here.
  */
 export function bulkDeleteToast(r: BulkDeleteResult): { type: 'success' | 'error'; message: string } {
 	if (r.failed) return { type: 'error', message: r.deleted > 0 ? `Deleted ${r.deleted}, but some snapshots could not be deleted` : 'Snapshots could not be deleted' };

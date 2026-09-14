@@ -8,8 +8,9 @@
 	import { formatDateTime, formatRelativeTime } from '$lib/stores/settings';
 	import { formatBytes } from '$lib/utils/format';
 	import { readJobResponse } from '$lib/utils/sse-fetch';
-	import { getRepoTypeIcon, selectOwnSnapshotsFromDestination, bulkDeleteSnapshots, bulkDeleteToast } from '$lib/utils/backup';
+	import { getRepoTypeIcon, selectOwnSnapshotsFromDestination, bulkDeleteSnapshots, bulkDeleteToast, bulkDeleteFailure } from '$lib/utils/backup';
 	import BulkDeleteSnapshotsDialog from '$lib/components/BulkDeleteSnapshotsDialog.svelte';
+	import BulkDeleteErrorDialog from '$lib/components/BulkDeleteErrorDialog.svelte';
 	import SnapshotBrowser from './SnapshotBrowser.svelte';
 	import RestoreModal from './RestoreModal.svelte';
 	import SnapshotDiffModal from '../backups/SnapshotDiffModal.svelte';
@@ -57,6 +58,9 @@
 	let bulkDeleting = $state(false);
 	let bulkDialogOpen = $state(false);
 	let bulkScope = $state<'selected' | 'all'>('selected');
+	let bulkDeleteErrorOpen = $state(false);
+	let bulkDeleteError = $state('');
+	let bulkDeleteErrorDeleted = $state(0);
 	// snapshotId → { filesNew, filesChanged, dataAdded } from schedule executions.
 	let stats = $state<Map<string, { filesNew: number; filesChanged: number; dataAdded: number }>>(new Map());
 
@@ -251,8 +255,15 @@
 		bulkDeleting = true;
 		try {
 			const result = await bulkDeleteSnapshots(targets);
-			const t = bulkDeleteToast(result);
-			toast[t.type](t.message);
+			const failure = bulkDeleteFailure(result);
+			if (failure) {
+				bulkDeleteError = failure.error;
+				bulkDeleteErrorDeleted = failure.deleted;
+				bulkDeleteErrorOpen = true;
+			} else {
+				const t = bulkDeleteToast(result);
+				toast[t.type](t.message);
+			}
 			selectedSnapshots = new Set();
 			await loadSnapshots();
 		} finally {
@@ -411,6 +422,7 @@
 {/if}
 
 <BulkDeleteSnapshotsDialog bind:open={bulkDialogOpen} count={bulkCount} busy={bulkDeleting} onConfirm={() => bulkDelete(bulkScope)} />
+<BulkDeleteErrorDialog bind:open={bulkDeleteErrorOpen} error={bulkDeleteError} deleted={bulkDeleteErrorDeleted} />
 
 <SnapshotBrowser
 	bind:open={showBrowser}

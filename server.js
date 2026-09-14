@@ -267,6 +267,13 @@ function buildDockerStreamRequest(path, target, body = '') {
 	);
 }
 
+// Mirrors translateAttachInput in docker-stream-core.ts: for non-TTY attach map a lone
+// \r (xterm Enter) to \n (no pty to do it); exec / TTY attach pass through. Keep in sync.
+function translateAttachInput(data, nonTtyAttach) {
+	if (!nonTtyAttach) return data;
+	return data.replace(/\r(?!\n)/g, '\n');
+}
+
 function createDockerStreamState(multiplexed = false) {
 	return {
 		headersStripped: false,
@@ -538,7 +545,8 @@ async function handleTerminalConnection(ws, url, connId) {
 			try {
 				const msg = JSON.parse(data.toString());
 				if (msg.type === 'input' && msg.data) {
-					dockerStream.write(msg.data);
+					// Non-TTY attach has no pty to convert Enter (\r) to a newline.
+					dockerStream.write(translateAttachInput(msg.data, multiplexed));
 				} else if (msg.type === 'resize' && msg.cols && msg.rows) {
 					if (mode === 'attach') {
 						if (typeof globalThis.__terminalResizeContainer === 'function') {
@@ -644,10 +652,12 @@ function handleEdgeExec(ws, connId, containerId, shell, user, environmentId, mod
 		try {
 			const msg = JSON.parse(data.toString());
 			if (msg.type === 'input' && msg.data) {
+				// Non-TTY attach has no pty to convert Enter (\r) to a newline.
+				const inputData = translateAttachInput(msg.data, attach && multiplexed);
 				const inputMsg = JSON.stringify({
 					type: 'exec_input',
 					execId,
-					data: Buffer.from(msg.data).toString('base64')
+					data: Buffer.from(inputData).toString('base64')
 				});
 				globalThis.__hawserSendMessage(environmentId, inputMsg);
 			} else if (msg.type === 'resize' && msg.cols && msg.rows) {

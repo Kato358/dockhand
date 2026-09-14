@@ -28,6 +28,7 @@
 	import ContainerIcon from '$lib/components/ContainerIcon.svelte';
 	import BatchOperationModal from '$lib/components/BatchOperationModal.svelte';
 	import type { ComposeStackInfo, ContainerStats, StackContainer } from '$lib/types';
+	import { showsManagementActions } from '$lib/utils/stack-actions';
 	import StackModal from './StackModal.svelte';
 	import DeleteStackModal from './DeleteStackModal.svelte';
 	import ComposeOutputModal from './ComposeOutputModal.svelte';
@@ -2180,7 +2181,7 @@
 								{/snippet}
 							</GitDeployProgressPopover>
 						{/if}
-						{#if stack.status !== 'not deployed' && stack.status !== 'created'}
+						{#if showsManagementActions(source.sourceType, stack.status)}
 							{#if $canAccess('stacks', 'edit')}
 								{#if source.sourceType === 'git' && source.gitStack}
 									<button

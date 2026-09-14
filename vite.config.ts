@@ -184,7 +184,7 @@ function buildDockerStreamHttpRequest(path: string, target: DockerTarget, body =
 
 // ============ Stream Processing ============
 
-import { createDockerStreamState, processDockerStreamChunk, type DockerStreamState } from './src/lib/server/docker-stream-core';
+import { createDockerStreamState, processDockerStreamChunk, translateAttachInput, type DockerStreamState } from './src/lib/server/docker-stream-core';
 
 // ============ Hawser Edge Exec Messages ============
 
@@ -764,7 +764,9 @@ function webSocketPlugin(): Plugin {
 								try {
 									const msg = JSON.parse(message.toString());
 									if (msg.type === 'input') {
-										conn.ws.send(JSON.stringify(createExecInputMessage(edgeExecId, msg.data)));
+										// Non-TTY attach has no pty to convert Enter (\r) to a newline.
+										const inputData = translateAttachInput(msg.data, !!session.streamState?.multiplexed);
+										conn.ws.send(JSON.stringify(createExecInputMessage(edgeExecId, inputData)));
 									} else if (msg.type === 'resize') {
 										conn.ws.send(JSON.stringify(createExecResizeMessage(edgeExecId, msg.cols, msg.rows)));
 									}
@@ -785,7 +787,8 @@ function webSocketPlugin(): Plugin {
 					try {
 						const msg = JSON.parse(message.toString());
 						if (msg.type === 'input' && d.stream) {
-							d.stream.write(msg.data);
+							// Non-TTY attach has no pty to convert Enter (\r) to a newline.
+							d.stream.write(translateAttachInput(msg.data, d.mode === 'attach' && d.state.multiplexed));
 						} else if (msg.type === 'resize') {
 							if (d.mode === 'attach') {
 								resizeContainerForWs(d.containerId, msg.cols, msg.rows, d.target);

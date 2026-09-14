@@ -26,9 +26,10 @@
 	import { formatDateTime, formatRelativeTime } from '$lib/stores/settings';
 	import { currentEnvironment } from '$lib/stores/environment';
 	import { watchJob, readJobResponse } from '$lib/utils/sse-fetch';
-	import { getRepoTypeIcon, formatCron, retentionSummary, classifyJobResult, tagLogLine, bulkDeleteSnapshots, bulkDeleteToast } from '$lib/utils/backup';
+	import { getRepoTypeIcon, formatCron, retentionSummary, classifyJobResult, tagLogLine, bulkDeleteSnapshots, bulkDeleteToast, bulkDeleteFailure } from '$lib/utils/backup';
 	import { Checkbox } from '$lib/components/ui/checkbox';
 	import BulkDeleteSnapshotsDialog from '$lib/components/BulkDeleteSnapshotsDialog.svelte';
+	import BulkDeleteErrorDialog from '$lib/components/BulkDeleteErrorDialog.svelte';
 	import SnapshotBrowser from '../containers/SnapshotBrowser.svelte';
 	import RestoreModal from '../containers/RestoreModal.svelte';
 	import BackupLogModal from './BackupLogModal.svelte';
@@ -113,6 +114,9 @@
 	let bulkDialogOpen = $state(false);
 	let bulkDeleting = $state(false);
 	let bulkConfig = $state<BackupConfig | null>(null);
+	let bulkDeleteErrorOpen = $state(false);
+	let bulkDeleteError = $state('');
+	let bulkDeleteErrorDeleted = $state(0);
 	// Snapshots of a config, normalized to {id, _destinationId} for the shared helper.
 	function configSelectedTargets(config: BackupConfig) {
 		return (snapshotsMap.get(config.key) || [])
@@ -139,8 +143,15 @@
 		bulkDeleting = true;
 		try {
 			const result = await bulkDeleteSnapshots(configSelectedTargets(config));
-			const t = bulkDeleteToast(result);
-			toast[t.type](t.message);
+			const failure = bulkDeleteFailure(result);
+			if (failure) {
+				bulkDeleteError = failure.error;
+				bulkDeleteErrorDeleted = failure.deleted;
+				bulkDeleteErrorOpen = true;
+			} else {
+				const t = bulkDeleteToast(result);
+				toast[t.type](t.message);
+			}
 			selectedSnapshots = new Set();
 			await loadSnapshots(config);
 			const loaded = snapshotsMap.get(config.key);
@@ -1146,6 +1157,7 @@
 </div>
 
 <BulkDeleteSnapshotsDialog bind:open={bulkDialogOpen} count={bulkConfig ? configSelectedTargets(bulkConfig).length : 0} busy={bulkDeleting} onConfirm={bulkDeleteConfig} />
+<BulkDeleteErrorDialog bind:open={bulkDeleteErrorOpen} error={bulkDeleteError} deleted={bulkDeleteErrorDeleted} />
 
 <SnapshotBrowser
 	bind:open={showBrowser}

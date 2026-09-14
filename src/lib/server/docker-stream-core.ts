@@ -136,3 +136,18 @@ export function processDockerStreamChunk(data: Buffer | Uint8Array | string, sta
 
 	return output;
 }
+
+/**
+ * Translate terminal input before writing it to the container's stdin. xterm sends a
+ * carriage return (\r) when Enter is pressed; with a TTY the pty converts that to a
+ * newline, but attach to a container started without a tty has no pty, so a shell
+ * `read` never sees an end-of-line and the session looks unresponsive. When
+ * `nonTtyAttach` is set, map a lone \r to \n (leaving an existing \r\n alone) so Enter
+ * ends a line. For exec and TTY attach (nonTtyAttach false) the input passes through
+ * verbatim. The gate lives here so it is unit-tested alongside the transform, rather
+ * than only in the inline call-site ternaries.
+ */
+export function translateAttachInput(data: string, nonTtyAttach: boolean): string {
+	if (!nonTtyAttach) return data;
+	return data.replace(/\r(?!\n)/g, '\n');
+}

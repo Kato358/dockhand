@@ -1,8 +1,8 @@
 [
   {
     "version": "1.0.48",
-    "date": "",
-    "comingSoon": true,
+    "date": "2026-09-14",
+    "comingSoon": false,
     "changes": [
       { "type": "feature", "text": "bulk-delete snapshots, and optionally forget a config's snapshots when you delete it (#1556)" },
       { "type": "feature", "text": "option to choose which stack operations show the full log (#1558)" },
@@ -13,7 +13,10 @@
       { "type": "fix", "text": "stop password managers from offering to save stack secret env-var fields (#1517)" },
       { "type": "fix", "text": "repository stats no longer fail on the backups screen (#1561)" },
       { "type": "fix", "text": "dashboard image disk usage no longer counts shared layers multiple times (PR#1461, @omggga)" },
-      { "type": "feature", "text": "add a docker attach terminal mode (#1078, PR#1377, @ivanjx)" }
+      { "type": "feature", "text": "add a docker attach terminal mode (#1078, PR#1377, @ivanjx)" },
+      { "type": "fix", "text": "stack action buttons show for stopped and freshly created stacks, regression (#1565)" },
+      { "type": "fix", "text": "the update dialog no longer shows an unreleased version as the target (#1566)" },
+      { "type": "fix", "text": "update Go 1.26.8, docker-compose 5.5.0-r5, nodemailer 9.1.0, js-yaml 4.3.2 for security fixes" }
     ],
     "imageTag": "fnsys/dockhand:v1.0.48"
   },

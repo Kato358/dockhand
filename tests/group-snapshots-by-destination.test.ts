@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from 'bun:test';
-import { groupSnapshotIdsByDestination, bulkDeleteSnapshots, bulkDeleteToast } from '../src/lib/utils/backup';
+import { groupSnapshotIdsByDestination, bulkDeleteSnapshots, bulkDeleteToast, bulkDeleteFailure } from '../src/lib/utils/backup';
 
 const snap = (id: string, dest: number) => ({ id, _destinationId: dest });
 
@@ -95,5 +95,30 @@ describe('bulkDeleteSnapshots', () => {
 		const r = await bulkDeleteSnapshots([snap('a', 1), snap('b', 2)]);
 		expect(r.failed).toBe(true);
 		expect(r.deleted).toBe(1);
+	});
+
+	it('carries the raw restic error from the first failing repo', async () => {
+		globalThis.fetch = (async (_url: string, init: any) => {
+			const body = JSON.parse(init.body);
+			if (body.destinationId === 2) return { ok: false, json: async () => ({ deleted: [], error: 'repository is already locked\ncontext canceled' }) } as any;
+			return { ok: true, json: async () => ({ deleted: ['a'], skipped: [] }) } as any;
+		}) as any;
+		const r = await bulkDeleteSnapshots([snap('a', 1), snap('b', 2)]);
+		expect(r.failed).toBe(true);
+		expect(r.error).toBe('repository is already locked\ncontext canceled');
+	});
+});
+
+describe('bulkDeleteFailure', () => {
+	it('returns the raw error and deleted count on a hard failure', () => {
+		expect(bulkDeleteFailure({ deleted: 1, skipped: 0, failed: true, error: 'repo locked' }))
+			.toEqual({ error: 'repo locked', deleted: 1 });
+	});
+	it('is null when nothing failed (toast handles success/skipped)', () => {
+		expect(bulkDeleteFailure({ deleted: 3, skipped: 0, failed: false })).toBeNull();
+		expect(bulkDeleteFailure({ deleted: 0, skipped: 2, failed: false })).toBeNull();
+	});
+	it('is null when failed but no verbatim error (thrown fetch) - toast falls back', () => {
+		expect(bulkDeleteFailure({ deleted: 0, skipped: 0, failed: true })).toBeNull();
 	});
 });

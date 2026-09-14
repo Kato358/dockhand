@@ -631,7 +631,7 @@
   },
   {
     "name": "dockhand",
-    "version": "1.0.45",
+    "version": "1.0.46",
     "license": "UNLICENSED",
     "repository": null
   },
@@ -817,7 +817,7 @@
   },
   {
     "name": "js-yaml",
-    "version": "4.3.1",
+    "version": "4.3.2",
     "license": "MIT",
     "repository": "https://github.com/nodeca/js-yaml"
   },
@@ -943,7 +943,7 @@
   },
   {
     "name": "nodemailer",
-    "version": "9.0.1",
+    "version": "9.1.0",
     "license": "MIT-0",
     "repository": "https://github.com/nodemailer/nodemailer"
   },

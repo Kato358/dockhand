@@ -3,6 +3,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Sparkles, Bug, Zap, CheckCircle, ScrollText } from 'lucide-svelte';
 	import { compareVersions } from '$lib/utils/version';
+	import { releasedEntries } from '$lib/utils/changelog-filter';
 	import ChangelogText from '$lib/components/ChangelogText.svelte';
 
 	interface ChangelogEntry {
@@ -10,6 +11,7 @@
 		date: string;
 		changes: Array<{ type: string; text: string }>;
 		imageTag?: string;
+		comingSoon?: boolean;
 	}
 
 	interface Props {
@@ -22,9 +24,11 @@
 
 	let { open = $bindable(), version, changelog, lastSeenVersion, onDismiss }: Props = $props();
 
-	// Filter to show versions newer than lastSeenVersion, limited to 3 most recent
+	// Versions newer than lastSeenVersion, 3 most recent. Coming-soon (unreleased)
+	// entries are excluded: the user is on a released build, so an unreleased version
+	// must never appear as something they "missed".
 	const missedReleases = $derived(
-		changelog
+		releasedEntries(changelog)
 			.filter((r) => {
 				if (!lastSeenVersion) return true; // Show all if first time
 				return compareVersions(r.version, lastSeenVersion.replace(/^v/, '')) > 0;

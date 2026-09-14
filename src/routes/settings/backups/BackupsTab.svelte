@@ -16,8 +16,9 @@
 	import { FolderOpen, Box, Layers, FileStack, Camera, ChevronRight, ChevronDown } from 'lucide-svelte';
 	import { formatBytes } from '$lib/utils/format';
 	import { Checkbox } from '$lib/components/ui/checkbox';
-	import { bulkDeleteSnapshots, bulkDeleteToast } from '$lib/utils/backup';
+	import { bulkDeleteSnapshots, bulkDeleteToast, bulkDeleteFailure } from '$lib/utils/backup';
 	import BulkDeleteSnapshotsDialog from '$lib/components/BulkDeleteSnapshotsDialog.svelte';
+	import BulkDeleteErrorDialog from '$lib/components/BulkDeleteErrorDialog.svelte';
 	import EnvironmentIcon from '$lib/components/EnvironmentIcon.svelte';
 	import { LoadingState } from '$lib/components/ui/loading-state';
 	import { getRepoTypeIcon, getRepoTypeLabel } from '$lib/utils/backup';
@@ -290,6 +291,9 @@
 	let selectedSnapshots = $state<Set<string>>(new Set());
 	let bulkDialogOpen = $state(false);
 	let bulkDeleting = $state(false);
+	let bulkDeleteErrorOpen = $state(false);
+	let bulkDeleteError = $state('');
+	let bulkDeleteErrorDeleted = $state(0);
 	function toggleSnapshotSel(id: string) {
 		const next = new Set(selectedSnapshots);
 		if (next.has(id)) next.delete(id); else next.add(id);
@@ -310,8 +314,15 @@
 		bulkDeleting = true;
 		try {
 			const result = await bulkDeleteSnapshots(targets);
-			const t = bulkDeleteToast(result);
-			toast[t.type](t.message);
+			const failure = bulkDeleteFailure(result);
+			if (failure) {
+				bulkDeleteError = failure.error;
+				bulkDeleteErrorDeleted = failure.deleted;
+				bulkDeleteErrorOpen = true;
+			} else {
+				const t = bulkDeleteToast(result);
+				toast[t.type](t.message);
+			}
 			selectedSnapshots = new Set();
 			const dest = destinations.find((d) => d.id === browseDestId);
 			if (dest) await browseDestination(dest);
@@ -933,6 +944,7 @@
 </Dialog.Root>
 
 <BulkDeleteSnapshotsDialog bind:open={bulkDialogOpen} count={browseSelectedCount} busy={bulkDeleting} onConfirm={bulkDeleteBrowsed} />
+<BulkDeleteErrorDialog bind:open={bulkDeleteErrorOpen} error={bulkDeleteError} deleted={bulkDeleteErrorDeleted} />
 
 <SnapshotBrowser
 	bind:open={snapshotBrowseOpen}

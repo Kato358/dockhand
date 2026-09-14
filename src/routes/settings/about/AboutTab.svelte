@@ -1,6 +1,7 @@
 <script lang="ts">
 	// Trigger rebuild for debug logging changes
 	import * as Card from '$lib/components/ui/card';
+	import { releasedEntries } from '$lib/utils/changelog-filter';
 	import { Badge } from '$lib/components/ui/badge';
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
@@ -33,6 +34,7 @@
 		date: string;
 		changes: ChangelogChange[];
 		imageTag: string;
+		comingSoon?: boolean;
 	}
 
 	let dependencies = $state<Dependency[]>([]);
@@ -84,7 +86,9 @@
 		try {
 			const res = await fetch('/api/changelog');
 			if (!res.ok) throw new Error('Failed to fetch changelog');
-			changelog = await res.json();
+			// Shipped releases only: an unreleased (coming-soon) entry must not show as
+			// the "Latest" version.
+			changelog = releasedEntries(await res.json());
 		} catch (e) {
 			changelogError = e instanceof Error ? e.message : 'Unknown error';
 		} finally {

@@ -34,6 +34,7 @@ import {
 	hashDirFiles,
 	computeDeletions,
 	buildNextManifest,
+	canSkipTreeRehash,
 	buildSyncChangeSummary,
 	formatChangeTable,
 	skipReasonMessage,
@@ -470,13 +471,34 @@ async function computeSyncDeletionPlan(options: {
 	composeDir: string; // absolute path inside the clone
 	composeFileName: string | undefined; // compose file relative to composeDir
 	rawManifest: string | null | undefined;
+	// When the caller's git diff proved NOTHING changed in the compose dir between
+	// the deployed commit and the new clone, hashing the whole tree is pure waste:
+	// no file changed, so none was deleted. Large trees (tens of thousands of files)
+	// otherwise block the event loop re-hashing unchanged files on every deploy.
+	// undefined = unknown -> hash (safe default; e.g. new clone / diff failed).
+	changedInComposeDir?: boolean;
+	// The commit the git diff was taken against. Skipping is only safe when this
+	// equals the manifest's own commit; otherwise the diff baseline has drifted
+	// from the manifest (e.g. a bare Sync advanced lastCommit without persisting
+	// the manifest) and a full re-hash is required to stay correct.
+	diffBaselineCommit?: string | null;
 }): Promise<{ plan: DeletionPlan; newFiles: Record<string, string>; previousManifest: SyncManifest }> {
-	const { logPrefix, composeDir, composeFileName, rawManifest } = options;
+	const { logPrefix, composeDir, composeFileName, rawManifest, changedInComposeDir, diffBaselineCommit } = options;
 
 	const previousManifest = parseManifest(rawManifest);
+	const manifestSize = Object.keys(previousManifest.files).length;
+
+	// Fast path: git proved no compose-dir file changed, the diff baseline matches
+	// the manifest's commit, and we have a prior manifest. Nothing can have been
+	// added/modified/deleted, so carry the manifest forward verbatim instead of
+	// re-hashing the entire tree.
+	if (canSkipTreeRehash(changedInComposeDir, manifestSize, previousManifest.commit, diffBaselineCommit)) {
+		console.log(`${logPrefix} Deletion sync: no compose-dir changes, skipping full re-hash of ${manifestSize} file(s)`);
+		return { plan: { toDelete: [], skipped: [] }, newFiles: { ...previousManifest.files }, previousManifest };
+	}
+
 	const newFiles = hashDirFiles(composeDir);
 
-	const manifestSize = Object.keys(previousManifest.files).length;
 	console.log(`${logPrefix} Deletion sync: manifest has ${manifestSize} file(s)${manifestSize === 0 ? ' (first sync — nothing will be deleted)' : ''}`);
 
 	// First sync / legacy manifest: nothing was recorded, so nothing can be deleted
@@ -1236,12 +1258,17 @@ export async function syncGitStack(stackId: number): Promise<SyncResult> {
 			console.log(`${logPrefix} No env file path configured`);
 		}
 
-		// Deletion sync (#966): manifest-vs-clone deletion plan
+		// Deletion sync (#966): manifest-vs-clone deletion plan.
+		// `updated` is the dir-scoped git-diff result (false when the commit didn't
+		// change OR no compose-dir file changed) - lets the plan skip re-hashing an
+		// unchanged tree.
 		const deletionData = await computeSyncDeletionPlan({
 			logPrefix,
 			composeDir,
 			composeFileName,
-			rawManifest: gitStack.syncedFiles
+			rawManifest: gitStack.syncedFiles,
+			changedInComposeDir: updated,
+			diffBaselineCommit: previousCommit
 		});
 
 		// Update git stack status
@@ -1875,13 +1902,17 @@ export async function deployGitStackWithProgress(
 			}
 		}
 
-		// Deletion sync (#966): manifest-vs-clone deletion plan
+		// Deletion sync (#966): manifest-vs-clone deletion plan. `updated` is the
+		// dir-scoped git-diff result; when nothing changed the plan skips re-hashing
+		// the whole tree.
 		const logPrefix = `[Stack:${gitStack.stackName}]`;
 		const deletionData = await computeSyncDeletionPlan({
 			logPrefix,
 			composeDir,
 			composeFileName: progressComposeFileName,
-			rawManifest: gitStack.syncedFiles
+			rawManifest: gitStack.syncedFiles,
+			changedInComposeDir: updated,
+			diffBaselineCommit: previousCommit
 		});
 
 		// Update git stack status

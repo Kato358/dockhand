@@ -1,5 +1,6 @@
 <script lang="ts">
 	import * as Dialog from '$lib/components/ui/dialog';
+	import { releasedEntries } from '$lib/utils/changelog-filter';
 	import { Button } from '$lib/components/ui/button';
 	import { Badge } from '$lib/components/ui/badge';
 	import { Progress } from '$lib/components/ui/progress';
@@ -12,6 +13,7 @@
 		date: string;
 		changes: Array<{ type: string; text: string }>;
 		imageTag?: string;
+		comingSoon?: boolean;
 	}
 
 	interface Props {
@@ -159,7 +161,9 @@
 			);
 
 			if (response.ok) {
-				const changelog: ChangelogEntry[] = await response.json();
+				// Drop coming-soon (unreleased) entries: the update only ever goes to a
+				// released version, so an unreleased changelog entry must not appear here.
+				const changelog: ChangelogEntry[] = releasedEntries(await response.json());
 				if (currentVersion && changelog.length > 0) {
 					const newer = changelog.filter(entry => compareVersions(entry.version, currentVersion) > 0);
 					releaseNotes = newer.length > 0 ? newer : changelog.slice(0, 1);
