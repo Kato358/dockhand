@@ -775,22 +775,22 @@
 							</button>
 						{/if}
 						<!-- Always visible: test, edit, delete -->
-						<button type="button" class="p-0.5 rounded hover:bg-muted transition-colors opacity-70 hover:opacity-100" onclick={() => testDestination(dest.id)} disabled={testingId === dest.id} title="Test connection">
+						<button type="button" class="p-0.5 rounded hover:bg-muted transition-colors opacity-70 hover:opacity-100" onclick={() => testDestination(dest.id)} disabled={testingId === dest.id} title="测试连接">
 							{#if testingId === dest.id}<RefreshCw class="grid-action-icon text-muted-foreground animate-spin" />{:else}<Wifi class="grid-action-icon grid-action-restart text-muted-foreground" />{/if}
 						</button>
 						{#if $canAccess('backups', 'manage')}
 							<button type="button" class="p-0.5 rounded hover:bg-muted transition-colors opacity-70 hover:opacity-100" onclick={() => { rotateDestId = dest.id; rotateDestName = dest.name; rotateModalOpen = true; }} title="Rotate repository password">
 								<KeyRound class="grid-action-icon grid-action-edit text-muted-foreground" />
 							</button>
-							<button type="button" class="p-0.5 rounded hover:bg-muted transition-colors opacity-70 hover:opacity-100" onclick={() => openModal(dest)} title="Edit">
+							<button type="button" class="p-0.5 rounded hover:bg-muted transition-colors opacity-70 hover:opacity-100" onclick={() => openModal(dest)} title="编辑">
 								<Pencil class="grid-action-icon grid-action-edit text-muted-foreground" />
 							</button>
 							<ConfirmPopover
 								open={confirmDeleteId === dest.id}
-								action="Delete"
+								action="删除"
 								itemType="destination"
 								itemName={dest.name}
-								title="Remove"
+								title="移除"
 								position="left"
 								onConfirm={() => deleteDestination(dest.id)}
 								onOpenChange={(open) => confirmDeleteId = open ? dest.id : null}
@@ -938,7 +938,7 @@
 			{/if}
 		</div>
 		<Dialog.Footer class="pt-4">
-			<Button variant="outline" onclick={() => browseOpen = false}>Close</Button>
+			<Button variant="outline" onclick={() => browseOpen = false}>关闭</Button>
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>

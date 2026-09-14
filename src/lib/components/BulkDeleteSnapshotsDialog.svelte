@@ -27,7 +27,7 @@
 			{count === 1 ? 'its' : 'their'} backup repository. This cannot be undone.
 		</p>
 		<Dialog.Footer class="gap-2 sm:justify-end">
-			<Button variant="outline" onclick={() => (open = false)} disabled={busy}>Cancel</Button>
+			<Button variant="outline" onclick={() => (open = false)} disabled={busy}>取消</Button>
 			<Button variant="destructive" onclick={onConfirm} disabled={busy}>
 				{#if busy}<Loader2 class="mr-1 h-4 w-4 animate-spin" />{:else}<Trash2 class="mr-1 h-4 w-4" />{/if}
 				Delete

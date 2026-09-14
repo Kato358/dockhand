@@ -1083,7 +1083,7 @@
 								<svelte:component this={getSortIcon('modified')} class="w-3 h-3 opacity-50" />
 							</button>
 						</Table.Head>
-						<Table.Head class="w-[21%] py-1.5 text-xs font-medium text-right">Actions</Table.Head>
+						<Table.Head class="w-[21%] py-1.5 text-xs font-medium text-right">操作</Table.Head>
 					</Table.Row>
 				</Table.Header>
 				<Table.Body>
@@ -1198,10 +1198,10 @@
 										</Button>
 										<ConfirmPopover
 											open={confirmDeleteEntry === entry.name}
-											action="Delete"
+											action="删除"
 											itemType={entry.type === 'directory' ? 'directory' : 'file'}
 											itemName={entry.name}
-											confirmText="Delete"
+											confirmText="删除"
 											variant="destructive"
 											onConfirm={() => handleDelete(entry)}
 											onOpenChange={(open) => confirmDeleteEntry = open ? entry.name : null}
@@ -1286,10 +1286,10 @@
 				</Dialog.Description>
 			</Dialog.Header>
 			<Dialog.Footer class="gap-2 sm:justify-between">
-				<Button variant="outline" onclick={() => showCloseConfirm = false}>Cancel</Button>
+				<Button variant="outline" onclick={() => showCloseConfirm = false}>取消</Button>
 				<div class="flex gap-2">
 					<Button variant="destructive" onclick={forceCloseEditor}>Discard</Button>
-					<Button onclick={saveFile} disabled={savingFile}>Save</Button>
+					<Button onclick={saveFile} disabled={savingFile}>保存</Button>
 				</div>
 			</Dialog.Footer>
 		</Dialog.Content>
@@ -1353,7 +1353,7 @@
 			</p>
 		</div>
 		<Dialog.Footer>
-			<Button variant="outline" onclick={() => showCreateModal = false}>Cancel</Button>
+			<Button variant="outline" onclick={() => showCreateModal = false}>取消</Button>
 			<Button onclick={handleCreate} disabled={creating || !createName.trim()}>
 				{#if creating}
 					<Loader2 class="w-4 h-4 mr-2 animate-spin" />
@@ -1381,7 +1381,7 @@
 			</div>
 		</div>
 		<Dialog.Footer>
-			<Button variant="outline" onclick={() => showRenameModal = false}>Cancel</Button>
+			<Button variant="outline" onclick={() => showRenameModal = false}>取消</Button>
 			<Button onclick={handleRename} disabled={renaming || !renameName.trim()}>
 				{#if renaming}
 					<Loader2 class="w-4 h-4 mr-2 animate-spin" />
@@ -1471,7 +1471,7 @@
 			{/if}
 		</div>
 		<Dialog.Footer>
-			<Button variant="outline" onclick={() => showChmodModal = false}>Cancel</Button>
+			<Button variant="outline" onclick={() => showChmodModal = false}>取消</Button>
 			<Button onclick={handleChmod} disabled={changingPerms || !chmodMode.trim()}>
 				{#if changingPerms}
 					<Loader2 class="w-4 h-4 mr-2 animate-spin" />

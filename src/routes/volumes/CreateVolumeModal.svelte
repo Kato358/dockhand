@@ -581,9 +581,7 @@
 			</div>
 
 			<Dialog.Footer class="pt-4">
-				<Button variant="outline" onclick={() => (open = false)} disabled={creating}>
-					Cancel
-				</Button>
+				<Button variant="outline" onclick={() => (open = false)} disabled={creating}>取消</Button>
 				<Button onclick={handleCreate} disabled={creating}>
 					{creating ? 'Creating...' : 'Create volume'}
 				</Button>

@@ -226,10 +226,10 @@
 							{#if $canAccess('registries', 'delete')}
 								<ConfirmPopover
 									open={confirmDeleteRegistryId === registry.id}
-									action="Delete"
+									action="删除"
 									itemType="registry"
 									itemName={registry.name}
-									title="Remove"
+									title="移除"
 									position="left"
 									onConfirm={() => deleteRegistry(registry.id)}
 									onOpenChange={(open) => confirmDeleteRegistryId = open ? registry.id : null}

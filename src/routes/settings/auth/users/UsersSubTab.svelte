@@ -428,7 +428,7 @@
 											{#if $canAccess('users', 'delete')}
 												<ConfirmPopover
 													open={confirmDeleteUserId === user.id}
-													action="Delete"
+													action="删除"
 													itemType="user"
 													itemName={user.username}
 													onConfirm={() => deleteLocalUser(user.id)}
@@ -480,7 +480,7 @@
 			</Dialog.Description>
 		</Dialog.Header>
 		<Dialog.Footer>
-			<Button variant="outline" onclick={cancelLastAdminDelete}>Cancel</Button>
+			<Button variant="outline" onclick={cancelLastAdminDelete}>取消</Button>
 			<Button variant="destructive" onclick={confirmLastAdminDelete}>
 				<Trash2 class="w-4 h-4" />
 				Delete and disable auth

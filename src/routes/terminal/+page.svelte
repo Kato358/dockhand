@@ -261,14 +261,14 @@
 
 {#if $environments.length === 0 || !$currentEnvironment}
 	<div class="flex flex-col flex-1 min-h-0 h-full">
-		<PageHeader icon={TerminalIcon} title="Shell" class="h-9 mb-3" />
+		<PageHeader icon={TerminalIcon} title="终端" class="h-9 mb-3" />
 		<NoEnvironment />
 	</div>
 {:else}
 <div class="flex flex-col flex-1 min-h-0 h-full gap-3">
 	<!-- Header with container selector -->
 	<div class="flex items-center gap-4 flex-wrap">
-		<PageHeader icon={TerminalIcon} title="Shell" />
+		<PageHeader icon={TerminalIcon} title="终端" />
 		<div class="relative flex-1 max-w-md min-w-[200px]">
 			<!-- Search input - always visible, shows selected container or placeholder -->
 			<div class="relative">
@@ -508,7 +508,7 @@
 					<button
 						onclick={() => terminalComponent?.copyOutput()}
 						class="p-1 rounded hover:bg-zinc-800 transition-colors"
-						title="Copy output"
+						title="复制输出"
 					>
 						<Copy class="w-3 h-3 text-zinc-500 hover:text-zinc-300" />
 					</button>
@@ -522,7 +522,7 @@
 					<button
 						onclick={() => terminalComponent?.reconnect()}
 						class="p-1 rounded hover:bg-zinc-800 transition-colors"
-						title="Reconnect"
+						title="重新连接"
 					>
 						<RefreshCw class="w-3 h-3 text-zinc-500 hover:text-zinc-300" />
 					</button>

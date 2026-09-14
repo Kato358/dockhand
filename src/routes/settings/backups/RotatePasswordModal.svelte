@@ -130,7 +130,7 @@
 		</div>
 
 		<Dialog.Footer>
-			<Button variant="outline" onclick={() => (open = false)} disabled={submitting}>Cancel</Button>
+			<Button variant="outline" onclick={() => (open = false)} disabled={submitting}>取消</Button>
 			<Button onclick={submit} disabled={!canSubmit}>
 				{#if submitting}
 					<Loader2 class="w-3 h-3 mr-2 animate-spin" />

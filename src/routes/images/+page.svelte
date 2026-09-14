@@ -955,7 +955,7 @@
 			tabs={[
 				{
 					id: 'images',
-					label: 'Images',
+					label: '镜像',
 					icon: Images,
 					count: activeTab === 'images' ? sortedGroups.length : groupedImages.length,
 					total: activeTab === 'images' && (searchQuery || usageFilter !== 'all') && sortedGroups.length !== groupedImages.length ? groupedImages.length : undefined,
@@ -1206,9 +1206,7 @@
 				onclick={bulkRemove}
 				disabled={selectedInFilter.length === 0}
 			>
-				<Trash2 class="w-3 h-3" />
-				Delete
-			</button>
+				<Trash2 class="w-3 h-3" />删除</button>
 			{/if}
 			</div>
 		{/if}
@@ -1523,10 +1521,10 @@
 									<div class="relative">
 										<ConfirmPopover
 											open={confirmDeleteId === tagInfo.fullRef}
-											action="Delete"
+											action="删除"
 											itemType="image"
 											itemName={tagInfo.fullRef}
-											title="Remove"
+											title="移除"
 											onConfirm={() => removeImage(tagInfo.imageId, tagInfo.fullRef)}
 											onOpenChange={(open) => confirmDeleteId = open ? tagInfo.fullRef : null}
 										>
@@ -1670,9 +1668,7 @@
 			</div>
 		</div>
 		<Dialog.Footer>
-			<Button variant="outline" onclick={() => showTagModal = false} disabled={tagging}>
-				Cancel
-			</Button>
+			<Button variant="outline" onclick={() => showTagModal = false} disabled={tagging}>取消</Button>
 			<Button
 				onclick={tagImage}
 				disabled={tagging || !tagNewRepo.trim() || !tagNewTag.trim()}

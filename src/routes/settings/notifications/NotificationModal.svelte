@@ -301,7 +301,7 @@
 <Dialog.Root bind:open onOpenChange={(o) => { if (o) { formError = ''; focusFirstInput(); } }}>
 	<Dialog.Content class="max-w-3xl max-h-[90vh] flex flex-col overflow-hidden">
 		<Dialog.Header>
-			<Dialog.Title>{isEditing ? 'Edit' : 'Add'} notification channel</Dialog.Title>
+			<Dialog.Title>{isEditing ? '编辑' : 'Add'} notification channel</Dialog.Title>
 		</Dialog.Header>
 
 		{#if formError}
@@ -517,7 +517,7 @@ zabbixs://hostname/api_jsonrpc.php?token=TOKEN&amp;host=HOST&amp;key=ITEM_KEY"
 				{/if}
 			</Button>
 			<div class="flex gap-2">
-				<Button variant="outline" onclick={handleClose}>Cancel</Button>
+				<Button variant="outline" onclick={handleClose}>取消</Button>
 				<Button onclick={save} disabled={formSaving || formTesting}>
 					{#if formSaving}
 						<RefreshCw class="w-4 h-4 mr-1 animate-spin" />
@@ -526,7 +526,7 @@ zabbixs://hostname/api_jsonrpc.php?token=TOKEN&amp;host=HOST&amp;key=ITEM_KEY"
 					{:else}
 						<Plus class="w-4 h-4" />
 					{/if}
-					{isEditing ? 'Save' : 'Add'}
+					{isEditing ? '保存' : 'Add'}
 				</Button>
 			</div>
 		</Dialog.Footer>

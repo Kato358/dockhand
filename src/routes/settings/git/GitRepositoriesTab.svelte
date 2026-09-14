@@ -200,7 +200,7 @@
 							class="h-7 w-7"
 							onclick={() => testRepository(repo.id)}
 							disabled={testingId === repo.id}
-							title="Test connection"
+							title="测试连接"
 						>
 							{#if testingId === repo.id}
 								<Loader2 class="w-3.5 h-3.5 animate-spin" />
@@ -214,10 +214,10 @@
 							</Button>
 							<ConfirmPopover
 								open={confirmDeleteId === repo.id}
-								action="Delete"
+								action="删除"
 								itemType="repository"
 								itemName={repo.name}
-								title="Delete"
+								title="删除"
 								onConfirm={() => deleteRepository(repo.id)}
 								onOpenChange={(open) => confirmDeleteId = open ? repo.id : null}
 							>

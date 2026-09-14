@@ -305,7 +305,7 @@
 			<button
 				onclick={copyOutput}
 				class="p-1 rounded hover:bg-zinc-800 transition-colors"
-				title="Copy output"
+				title="复制输出"
 			>
 				<Copy class="w-3 h-3 text-zinc-500 hover:text-zinc-300" />
 			</button>
@@ -314,7 +314,7 @@
 				<button
 					onclick={reconnect}
 					class="flex items-center gap-1 px-1.5 py-0.5 rounded text-xs bg-amber-500/20 ring-1 ring-amber-500/50 text-amber-400 hover:bg-amber-500/30 transition-colors"
-					title="Reconnect"
+					title="重新连接"
 				>
 					<RefreshCw class="w-3 h-3" />
 				</button>

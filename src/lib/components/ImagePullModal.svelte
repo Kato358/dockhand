@@ -312,7 +312,7 @@
 			{#if needsConfigureStep}
 				<div class="space-y-4 px-1 overflow-auto" class:hidden={activeTab !== 'configure'}>
 					<div class="space-y-2">
-						<Label>Registry</Label>
+						<Label>镜像仓库</Label>
 						<Select.Root
 							type="single"
 							value={selectedRegistryId === 'dockerhub' ? 'dockerhub' : selectedRegistryId ? String(selectedRegistryId) : undefined}
@@ -470,7 +470,7 @@
 						onclick={handleClose}
 						disabled={isProcessing}
 					>
-						{pullStatus === 'complete' && !envHasScanning ? 'Done' : 'Cancel'}
+						{pullStatus === 'complete' && !envHasScanning ? 'Done' : '取消'}
 					</Button>
 					{#if activeTab === 'configure'}
 						<Button

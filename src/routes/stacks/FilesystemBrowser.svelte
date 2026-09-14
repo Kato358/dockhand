@@ -343,7 +343,7 @@
 								type="button"
 								class="p-1 rounded hover:bg-muted text-muted-foreground"
 								onclick={cancelCreatingFolder}
-								title="Cancel"
+								title="取消"
 							>
 								<X class="w-4 h-4" />
 							</button>
@@ -468,9 +468,7 @@
 						Click a file to select it
 					</div>
 				{/if}
-				<Button variant="outline" onclick={handleClose}>
-					Cancel
-				</Button>
+				<Button variant="outline" onclick={handleClose}>取消</Button>
 				{#if selectMode === 'directory'}
 					<Button onclick={handleConfirm}>
 						<FolderPlus class="w-4 h-4" />

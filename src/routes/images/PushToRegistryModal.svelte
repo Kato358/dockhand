@@ -277,7 +277,7 @@
 					onclick={handleClose}
 					disabled={isProcessing}
 				>
-					{pushStatus === 'complete' ? 'Done' : 'Cancel'}
+					{pushStatus === 'complete' ? 'Done' : '取消'}
 				</Button>
 				{#if currentStep === 'configure'}
 					<Button

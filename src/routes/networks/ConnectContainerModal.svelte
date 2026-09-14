@@ -153,9 +153,7 @@
 		</div>
 
 		<Dialog.Footer>
-			<Button variant="outline" onclick={() => open = false} disabled={submitting}>
-				Cancel
-			</Button>
+			<Button variant="outline" onclick={() => open = false} disabled={submitting}>取消</Button>
 			<Button
 				onclick={handleConnect}
 				disabled={!selectedContainer || submitting || availableContainers.length === 0}

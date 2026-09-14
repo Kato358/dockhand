@@ -1649,9 +1649,7 @@
 					Updates
 				</Tabs.Trigger>
 				<Tabs.Trigger value="activity" class="flex items-center justify-center gap-1.5">
-					<Activity class="w-3.5 h-3.5" />
-					Activity
-				</Tabs.Trigger>
+					<Activity class="w-3.5 h-3.5" />活动</Tabs.Trigger>
 				<Tabs.Trigger value="security" class="flex items-center justify-center gap-1.5">
 					<ShieldCheck class="w-3.5 h-3.5" />
 					Security
@@ -1659,9 +1657,7 @@
 				<!-- BETA GATE: Backups tab hidden unless FEAT_BACKUPS_ENABLED (see features.ts) -->
 				{#if $page.data.backupsEnabled}
 					<Tabs.Trigger value="backup" class="flex items-center justify-center gap-1.5">
-						<Archive class="w-3.5 h-3.5" />
-						Backups
-					</Tabs.Trigger>
+						<Archive class="w-3.5 h-3.5" />备份</Tabs.Trigger>
 				{/if}
 				<Tabs.Trigger value="notifications" class="flex items-center justify-center gap-1.5">
 					<Bell class="w-3.5 h-3.5" />
@@ -2327,7 +2323,7 @@
 														setTimeout(() => { copyCmdSuccess = null; }, 2000);
 													});
 												}}
-												title="Copy command"
+												title="复制命令"
 											>
 												{#if copyCmdSuccess === 'error'}
 													<Tooltip.Root open>
@@ -2470,7 +2466,7 @@
 														<button
 															class="shrink-0 p-0.5 rounded hover:bg-amber-200 dark:hover:bg-amber-800 transition-colors"
 															onclick={() => copyCommand(pendingToken!)}
-															title="Copy command"
+															title="复制命令"
 														>
 															{#if copyCmdSuccess === 'error'}
 																<Tooltip.Root open>
@@ -2537,7 +2533,7 @@
 														<button
 															class="shrink-0 p-0.5 rounded hover:bg-amber-200 dark:hover:bg-amber-800 transition-colors"
 															onclick={() => copyCommand(generatedToken!)}
-															title="Copy command"
+															title="复制命令"
 														>
 															{#if copyCmdSuccess === 'error'}
 																<Tooltip.Root open>
@@ -3114,9 +3110,7 @@
 
 				{#if !isEditing}
 					<!-- Add mode -->
-					<Button variant="outline" onclick={onClose}>
-						Cancel
-					</Button>
+					<Button variant="outline" onclick={onClose}>取消</Button>
 					<Button onclick={createEnvironment} disabled={formSaving}>
 						{#if formSaving}
 							<RefreshCw class="w-4 h-4 animate-spin" />
@@ -3127,9 +3121,7 @@
 					</Button>
 				{:else}
 					<!-- Edit mode -->
-					<Button variant="outline" onclick={onClose}>
-						Cancel
-					</Button>
+					<Button variant="outline" onclick={onClose}>取消</Button>
 					<Button onclick={updateEnvironment} disabled={formSaving}>
 						{#if formSaving}
 							<RefreshCw class="w-4 h-4 animate-spin" />
@@ -3262,9 +3254,7 @@
 			</Dialog.Description>
 		</Dialog.Header>
 		<div class="flex justify-end gap-2 mt-4">
-			<Button variant="outline" onclick={() => (showRenameConfirm = false)}>
-				Cancel
-			</Button>
+			<Button variant="outline" onclick={() => (showRenameConfirm = false)}>取消</Button>
 			<Button
 				variant="default"
 				onclick={async () => {

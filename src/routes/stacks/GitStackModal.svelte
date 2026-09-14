@@ -914,8 +914,7 @@
 					class="relative -mb-px flex items-center gap-1.5 border-b-2 px-3 py-2 text-sm transition-colors {activeTab === 'settings' ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'}"
 					onclick={() => (activeTab = 'settings')}
 				>
-					<Settings2 class="h-3.5 w-3.5" /> Settings
-				</button>
+					<Settings2 class="h-3.5 w-3.5" />设置</button>
 				<button
 					type="button"
 					class="relative -mb-px flex items-center gap-1.5 border-b-2 px-3 py-2 text-sm transition-colors {activeTab === 'deploys' ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'}"
@@ -1526,7 +1525,7 @@
 		{/if}
 
 		<Dialog.Footer class="px-5 py-2.5 border-t border-zinc-200 dark:border-zinc-700 flex-shrink-0">
-			<Button variant="outline" onclick={onClose}>{activeTab === 'backups' ? 'Close' : 'Cancel'}</Button>
+			<Button variant="outline" onclick={onClose}>{activeTab === 'backups' ? '关闭' : '取消'}</Button>
 			<!-- The deploy-form save buttons belong to the Settings tab. On the Backups
 			     tab the backup panel manages its own saving, so only Close is shown. -->
 			{#if activeTab !== 'backups'}

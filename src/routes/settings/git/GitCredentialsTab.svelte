@@ -146,10 +146,10 @@
 								</Button>
 								<ConfirmPopover
 									open={confirmDeleteId === cred.id}
-									action="Delete"
+									action="删除"
 									itemType="credential"
 									itemName={cred.name}
-									title="Delete"
+									title="删除"
 									onConfirm={() => deleteCredential(cred.id)}
 									onOpenChange={(open) => confirmDeleteId = open ? cred.id : null}
 								>

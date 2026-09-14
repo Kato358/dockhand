@@ -2167,7 +2167,7 @@
 				onclick={toggleConnectionMode}
 			>
 				<Link class="w-3 h-3" />
-				{connectionMode ? 'Cancel' : 'Dependency'}
+				{connectionMode ? '取消' : 'Dependency'}
 			</Button>
 
 			<!-- Mount mode toggle (volume/network/config/secret to service) -->
@@ -2178,7 +2178,7 @@
 				onclick={toggleMountMode}
 			>
 				<HardDrive class="w-3 h-3" />
-				{mountMode ? 'Cancel' : 'Mount'}
+				{mountMode ? '取消' : 'Mount'}
 			</Button>
 
 			<!-- Hint when in connection/mount mode -->
@@ -2381,7 +2381,7 @@
 									size="sm"
 									class="h-6 w-6 p-0 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"
 									onclick={deleteSelectedNode}
-									title="Delete"
+									title="删除"
 								>
 									<Trash2 class="w-3.5 h-3.5" />
 								</Button>
@@ -2390,7 +2390,7 @@
 									size="sm"
 									class="h-6 w-6 p-0 text-zinc-500 hover:text-zinc-600 hover:bg-zinc-100 dark:hover:bg-zinc-700"
 									onclick={() => { selectedNode = null; selectedEdge = null; }}
-									title="Close"
+									title="关闭"
 								>
 									<X class="w-3.5 h-3.5" />
 								</Button>
@@ -2424,7 +2424,7 @@
 									size="sm"
 									class="h-6 w-6 p-0 text-zinc-500 hover:text-zinc-600 hover:bg-zinc-100 dark:hover:bg-zinc-700"
 									onclick={() => { selectedNode = null; selectedEdge = null; }}
-									title="Close"
+									title="关闭"
 								>
 									<X class="w-3.5 h-3.5" />
 								</Button>
@@ -2511,7 +2511,7 @@
 								<!-- Volumes -->
 								<div class="space-y-1.5">
 									<div class="flex items-center justify-between">
-										<span class="text-xs font-medium text-zinc-600 dark:text-zinc-300">Volumes</span>
+										<span class="text-xs font-medium text-zinc-600 dark:text-zinc-300">存储卷</span>
 										<button onclick={addServiceVolume} class="text-xs text-blue-500 hover:text-blue-600">
 											<Plus class="w-3.5 h-3.5" />
 										</button>
@@ -3002,7 +3002,7 @@
 		</div>
 
 		<div class="flex justify-end gap-2">
-			<Button variant="outline" size="sm" onclick={() => showAddDialog = false}>Cancel</Button>
+			<Button variant="outline" size="sm" onclick={() => showAddDialog = false}>取消</Button>
 			<Button variant="secondary" size="sm" onclick={addElement} disabled={!newElementName.trim()}>
 				<Plus class="w-3.5 h-3.5 mr-1.5" />
 				Add {getElementTypeLabel(addElementType)}

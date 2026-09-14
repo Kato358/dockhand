@@ -170,7 +170,7 @@
 			{ key: 'restart', label: 'Restart containers' },
 			{ key: 'remove', label: 'Remove containers' },
 			{ key: 'exec', label: 'Execute terminal' },
-			{ key: 'logs', label: 'View logs' },
+			{ key: 'logs', label: '查看日志' },
 			{ key: 'inspect', label: 'Inspect containers' }
 		],
 		images: [
@@ -647,7 +647,7 @@
 		</div>
 
 		<Dialog.Footer class="flex-shrink-0 pt-4">
-			<Button variant="outline" onclick={handleClose}>Cancel</Button>
+			<Button variant="outline" onclick={handleClose}>取消</Button>
 			<Button onclick={save} disabled={formSaving}>
 				{#if formSaving}
 					<RefreshCw class="w-4 h-4 mr-1 animate-spin" />
@@ -656,7 +656,7 @@
 				{:else}
 					<Plus class="w-4 h-4" />
 				{/if}
-				{isEditing ? 'Save' : 'Create role'}
+				{isEditing ? '保存' : 'Create role'}
 			</Button>
 		</Dialog.Footer>
 	</Dialog.Content>

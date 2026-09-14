@@ -199,7 +199,7 @@
 		<Dialog.Header>
 			<Dialog.Title class="flex items-center gap-2">
 				<GitBranch class="w-5 h-5" />
-				{isEditing ? 'Edit' : 'Add'} Git repository
+				{isEditing ? '编辑' : 'Add'} Git repository
 			</Dialog.Title>
 			<Dialog.Description>
 				{isEditing ? 'Update repository settings' : 'Add a Git repository that can be used to deploy stacks'}
@@ -299,7 +299,7 @@
 			{/if}
 
 			<Dialog.Footer>
-				<Button variant="outline" type="button" onclick={onClose}>Cancel</Button>
+				<Button variant="outline" type="button" onclick={onClose}>取消</Button>
 				<Button
 					type="button"
 					variant="outline"

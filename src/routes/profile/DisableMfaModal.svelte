@@ -49,7 +49,7 @@
 			</p>
 		</div>
 		<Dialog.Footer>
-			<Button variant="outline" onclick={onClose}>Cancel</Button>
+			<Button variant="outline" onclick={onClose}>取消</Button>
 			<Button variant="destructive" onclick={disableMfa} disabled={loading}>
 				{#if loading}
 					<RefreshCw class="w-4 h-4 animate-spin" />

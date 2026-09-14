@@ -461,7 +461,7 @@
 			{/if}
 		</div>
 		<Dialog.Footer>
-			<Button variant="outline" onclick={() => (showAddModal = false)}>Cancel</Button>
+			<Button variant="outline" onclick={() => (showAddModal = false)}>取消</Button>
 			<Button onclick={createEnvironment} disabled={formSaving}>
 				{#if formSaving}
 					<RefreshCw class="w-4 h-4 mr-1 animate-spin" />
@@ -580,7 +580,7 @@
 			{/if}
 		</div>
 		<Dialog.Footer>
-			<Button variant="outline" onclick={() => { showEditModal = false; editingEnv = null; }}>Cancel</Button>
+			<Button variant="outline" onclick={() => { showEditModal = false; editingEnv = null; }}>取消</Button>
 			<Button onclick={updateEnvironment} disabled={formSaving}>
 				{#if formSaving}
 					<RefreshCw class="w-4 h-4 mr-1 animate-spin" />

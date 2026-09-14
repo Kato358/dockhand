@@ -284,7 +284,7 @@
 			<!-- Left: cancel (confirm step only). The log has its own copy button. -->
 			<div>
 				{#if overallStatus === 'confirming'}
-					<Button variant="outline" onclick={handleCancelConfirm}>Cancel</Button>
+					<Button variant="outline" onclick={handleCancelConfirm}>取消</Button>
 				{/if}
 			</div>
 

@@ -191,7 +191,7 @@
 						<Input id="new-source-url" bind:value={newUrl} placeholder="https://example.com/templates.json" class="h-8 text-sm" />
 					</div>
 					<Button size="sm" onclick={addSource} disabled={!newName.trim() || !newUrl.trim()}>Add</Button>
-					<Button size="sm" variant="ghost" onclick={() => addingNew = false}>Cancel</Button>
+					<Button size="sm" variant="ghost" onclick={() => addingNew = false}>取消</Button>
 				</div>
 			</Card.Content>
 		</Card.Root>

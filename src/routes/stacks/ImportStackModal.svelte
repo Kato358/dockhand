@@ -428,9 +428,7 @@
 					<Button variant="outline" onclick={goBackToBrowse}>
 						Back
 					</Button>
-					<Button variant="outline" onclick={handleClose}>
-						Cancel
-					</Button>
+					<Button variant="outline" onclick={handleClose}>取消</Button>
 					<Button
 						variant="default"
 						onclick={handleAdoptSelected}
@@ -515,9 +513,7 @@
 		{/if}
 
 		<div class="px-5 py-3 border-t flex justify-end gap-2 shrink-0">
-			<Button variant="outline" onclick={() => showPreview = false}>
-				Cancel
-			</Button>
+			<Button variant="outline" onclick={() => showPreview = false}>取消</Button>
 			<Button onclick={confirmAdoptFromPreview} disabled={adopting}>
 				{#if adopting}
 					<Loader2 class="w-4 h-4 mr-2 animate-spin" />

@@ -274,7 +274,7 @@
 							<Table.Head class="w-[60px] text-center">Color</Table.Head>
 							<Table.Head class="w-[80px] text-center">Environments</Table.Head>
 							<Table.Head>Used by</Table.Head>
-							<Table.Head class="w-[100px] text-right">Actions</Table.Head>
+							<Table.Head class="w-[100px] text-right">操作</Table.Head>
 						</Table.Row>
 					</Table.Header>
 					<Table.Body>
@@ -357,10 +357,10 @@
 										</Tooltip.Root>
 										<ConfirmPopover
 											open={confirmDeleteLabel === info.label}
-											action="Remove"
+											action="移除"
 											itemType="label"
 											itemName={info.label}
-											confirmText="Remove"
+											confirmText="移除"
 											position="left"
 											onConfirm={() => handleDelete(info)}
 											onOpenChange={(open) => confirmDeleteLabel = open ? info.label : null}
@@ -434,7 +434,7 @@
 			</div>
 		{/if}
 		<Dialog.Footer>
-			<Button variant="outline" onclick={() => showRenameDialog = false}>Cancel</Button>
+			<Button variant="outline" onclick={() => showRenameDialog = false}>取消</Button>
 			<Button
 				onclick={handleRename}
 				disabled={renaming || !newLabelName.trim() || newLabelName.trim() === renameTarget?.label}
@@ -510,7 +510,7 @@
 			</div>
 		</div>
 		<Dialog.Footer>
-			<Button variant="outline" onclick={() => showAddDialog = false}>Cancel</Button>
+			<Button variant="outline" onclick={() => showAddDialog = false}>取消</Button>
 			<Button
 				onclick={handleAdd}
 				disabled={adding || !addLabelName.trim() || addSelectedEnvIds.length === 0}

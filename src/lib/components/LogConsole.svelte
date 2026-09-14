@@ -54,7 +54,7 @@
 			<Terminal class="h-3.5 w-3.5" />
 			<span>Output ({lines.length} {lines.length === 1 ? 'line' : 'lines'})</span>
 		</div>
-		<button type="button" onclick={() => (dark = !dark)} class="cursor-pointer rounded p-1 transition-colors hover:bg-muted" title="Toggle log theme">
+		<button type="button" onclick={() => (dark = !dark)} class="cursor-pointer rounded p-1 transition-colors hover:bg-muted" title="切换日志主题">
 			{#if dark}<Sun class="h-3.5 w-3.5" />{:else}<Moon class="h-3.5 w-3.5" />{/if}
 		</button>
 	</div>

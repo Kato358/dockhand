@@ -103,9 +103,7 @@
 		</div>
 
 		<Dialog.Footer>
-			<Button variant="outline" onclick={() => (open = false)} disabled={cloning}>
-				Cancel
-			</Button>
+			<Button variant="outline" onclick={() => (open = false)} disabled={cloning}>取消</Button>
 			<Button onclick={handleClone} disabled={cloning || !newName.trim()}>
 				{#if cloning}
 					<Loader2 class="w-4 h-4 animate-spin" />

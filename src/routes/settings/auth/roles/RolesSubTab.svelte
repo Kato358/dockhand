@@ -406,10 +406,10 @@
 											</Button>
 											<ConfirmPopover
 												open={confirmDeleteRoleId === role.id}
-												action="Delete"
+												action="删除"
 												itemType="role"
 												itemName={role.name}
-												title="Delete"
+												title="删除"
 												onConfirm={() => deleteRole(role.id)}
 												onOpenChange={(open) => (confirmDeleteRoleId = open ? role.id : null)}
 											>

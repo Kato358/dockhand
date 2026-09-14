@@ -360,7 +360,7 @@
 			<div class="flex items-center gap-2 text-xs rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-2">
 				<Info class="h-3.5 w-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
 				<span class="flex-1">Reviewing merge into <span class="font-semibold">{mergedIntoStack}</span>. The highlighted service is what will be added.</span>
-				<Button variant="ghost" size="sm" onclick={cancelMerge} disabled={merging}>Cancel</Button>
+				<Button variant="ghost" size="sm" onclick={cancelMerge} disabled={merging}>取消</Button>
 				<Button size="sm" onclick={saveToExisting} disabled={merging}>
 					{#if merging}<Loader2 class="h-3.5 w-3.5 mr-1.5 animate-spin" />{:else}<Save class="h-3.5 w-3.5 mr-1.5" />{/if}
 					Save to {mergedIntoStack}

@@ -83,12 +83,10 @@
 		<Dialog.Footer class="pt-3">
 			{#if status === 'running' && onStop}
 				<Button variant="destructive" onclick={onStop}>
-					<Square class="w-3.5 h-3.5 mr-1" />
-					Stop
-				</Button>
+					<Square class="w-3.5 h-3.5 mr-1" />停止</Button>
 			{/if}
 			<Button variant="outline" onclick={() => (open = false)}>
-				{status === 'running' ? 'Run in background' : 'Close'}
+				{status === 'running' ? 'Run in background' : '关闭'}
 			</Button>
 		</Dialog.Footer>
 	</Dialog.Content>

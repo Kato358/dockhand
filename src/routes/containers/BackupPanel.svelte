@@ -615,12 +615,12 @@
 					<button type="button" class="p-1 rounded hover:bg-muted" onclick={() => runBackupNow(cfg)} disabled={runningBackup === cfg.id} title="Run now">
 						{#if runningBackup === cfg.id}<Loader2 class="w-3 h-3 animate-spin text-muted-foreground" />{:else}<Play class="w-3 h-3 text-muted-foreground" />{/if}
 					</button>
-					<button type="button" class="p-1 rounded hover:bg-muted" onclick={() => startEditConfig(cfg)} title="Edit">
+					<button type="button" class="p-1 rounded hover:bg-muted" onclick={() => startEditConfig(cfg)} title="编辑">
 						<Pencil class="w-3 h-3 text-muted-foreground" />
 					</button>
 					<ConfirmPopover
 						open={confirmDeleteId === cfg.id}
-						action="Delete"
+						action="删除"
 						itemType="backup schedule"
 						itemName={dest?.name || ''}
 						title={deleteConfigSnapshots ? 'Snapshots will be deleted too.' : 'Remove schedule (snapshots are kept)'}
@@ -790,12 +790,12 @@
 					</div>
 				{/if}
 
-				<!-- Submit actions. Editing existing config: just "Save".
+				<!-- Submit actions. Editing existing config: just "保存".
 				     Creating a new config: three actions, all use the same form
 				     state (destination, schedule, volumes, retention, options) —
 				     they only differ in what happens after persistence. -->
 				<div class="flex justify-end gap-2 pt-2 border-t">
-					<Button size="sm" variant="outline" onclick={cancelEdit}>Cancel</Button>
+					<Button size="sm" variant="outline" onclick={cancelEdit}>取消</Button>
 					{#if editingConfig}
 						<Button size="sm" onclick={() => submitForm('save')} disabled={saving || editScheduleInvalid}>
 							{#if saving}<Loader2 class="w-3.5 h-3.5 mr-1 animate-spin" />{:else}<Save class="w-3.5 h-3.5 mr-1" />{/if}

@@ -110,7 +110,7 @@
 		/>
 
 		<Dialog.Footer class="shrink-0">
-			<Button variant="outline" onclick={handleClose}>Close</Button>
+			<Button variant="outline" onclick={handleClose}>关闭</Button>
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>

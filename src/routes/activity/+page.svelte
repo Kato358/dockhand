@@ -145,11 +145,11 @@
 
 	const actionOptions = [
 		{ value: 'create', label: 'Create', icon: Plus, color: 'text-emerald-500' },
-		{ value: 'start', label: 'Start', icon: Play, color: 'text-emerald-500' },
-		{ value: 'stop', label: 'Stop', icon: Square, color: 'text-amber-500' },
+		{ value: 'start', label: '启动', icon: Play, color: 'text-emerald-500' },
+		{ value: 'stop', label: '停止', icon: Square, color: 'text-amber-500' },
 		{ value: 'die', label: 'Die', icon: Skull, color: 'text-red-500' },
 		{ value: 'kill', label: 'Kill', icon: Zap, color: 'text-red-500' },
-		{ value: 'restart', label: 'Restart', icon: RotateCcw, color: 'text-sky-500' },
+		{ value: 'restart', label: '重启', icon: RotateCcw, color: 'text-sky-500' },
 		{ value: 'pause', label: 'Pause', icon: Pause, color: 'text-amber-500' },
 		{ value: 'unpause', label: 'Unpause', icon: CirclePlay, color: 'text-emerald-500' },
 		{ value: 'destroy', label: 'Destroy', icon: Trash2, color: 'text-red-500' },
@@ -650,7 +650,7 @@
 	<!-- Header with inline filters -->
 	<div class="shrink-0 flex flex-wrap justify-between items-center gap-3 min-h-8">
 		<div class="flex items-center gap-3">
-			<PageHeader icon={Activity} title="Activity" count={visibleEnd > 0 ? `${visibleStart}-${visibleEnd}` : undefined} total={total > 0 ? total : undefined} countClass="min-w-32" />
+			<PageHeader icon={Activity} title="活动" count={visibleEnd > 0 ? `${visibleStart}-${visibleEnd}` : undefined} total={total > 0 ? total : undefined} countClass="min-w-32" />
 			<Badge variant="outline" class="gap-1.5 {($appSettings.eventCollectionMode || 'stream') === 'stream' ? 'text-green-500 border-green-500/50' : 'text-amber-500 border-amber-500/50'}">
 				{#if ($appSettings.eventCollectionMode || 'stream') === 'stream'}
 					<Wifi class="w-3 h-3" />
@@ -768,7 +768,7 @@
 				class="h-8 px-2"
 				onclick={clearFilters}
 				disabled={!hasActiveFilters}
-				title="Clear all filters"
+				title="清除所有筛选条件"
 			>
 				<X class="w-3.5 h-3.5" />
 			</Button>
@@ -961,7 +961,7 @@
 			</div>
 		{/if}
 		<Dialog.Footer>
-			<Button variant="outline" onclick={() => showDetailDialog = false}>Close</Button>
+			<Button variant="outline" onclick={() => showDetailDialog = false}>关闭</Button>
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>

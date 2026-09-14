@@ -371,7 +371,7 @@
 					<div class="flex justify-end">
 						<ConfirmPopover
 							open={confirmDeleteId === run.id}
-							action="Delete"
+							action="删除"
 							itemType="deploy run"
 							title="Delete this run"
 							position="left"
@@ -399,7 +399,7 @@
 			<div class="w-full p-4 pl-12 shadow-inner bg-muted text-xs">
 				<div class="grid grid-cols-2 gap-x-4 gap-y-1.5 sm:grid-cols-3">
 					<div>
-						<div class="text-muted-foreground">Containers</div>
+						<div class="text-muted-foreground">容器</div>
 						<div>{view.containerSummary}</div>
 						{#if view.containerNames.length > 0}
 							<div class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">

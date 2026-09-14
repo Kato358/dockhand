@@ -572,7 +572,7 @@
 		</div>
 		<Dialog.Footer class="mt-4">
 			{#if isEditing}
-				<Button variant="outline" type="button" onclick={handleClose}>Cancel</Button>
+				<Button variant="outline" type="button" onclick={handleClose}>取消</Button>
 				<Button type="submit" disabled={formSaving}>
 					{#if formSaving}
 						<RefreshCw class="w-4 h-4 mr-1 animate-spin" />
@@ -582,7 +582,7 @@
 					Save
 				</Button>
 			{:else}
-				<Button variant="outline" type="button" onclick={handleClose}>Cancel</Button>
+				<Button variant="outline" type="button" onclick={handleClose}>取消</Button>
 				<Button type="submit" disabled={formSaving}>
 					{#if formSaving}
 						<RefreshCw class="w-4 h-4 mr-1 animate-spin" />

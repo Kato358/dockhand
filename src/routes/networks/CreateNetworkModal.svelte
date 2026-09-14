@@ -624,7 +624,7 @@
 		{/if}
 
 		<Dialog.Footer class="mt-6">
-			<Button variant="outline" onclick={handleClose} disabled={creating}>Cancel</Button>
+			<Button variant="outline" onclick={handleClose} disabled={creating}>取消</Button>
 			<Button onclick={handleSubmit} disabled={creating}>
 				{#if creating}Creating...{:else}Create network{/if}
 			</Button>

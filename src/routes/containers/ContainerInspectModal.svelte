@@ -659,7 +659,7 @@
 					<button
 						type="button"
 						onclick={saveRename}
-						title="Save"
+						title="保存"
 						disabled={renaming}
 						class="p-1 rounded hover:bg-muted transition-colors"
 					>
@@ -672,7 +672,7 @@
 					<button
 						type="button"
 						onclick={cancelEditing}
-						title="Cancel"
+						title="取消"
 						disabled={renaming}
 						class="p-1 rounded hover:bg-muted transition-colors"
 					>
@@ -729,10 +729,10 @@
 							{#if onStop}
 								<ConfirmPopover
 									open={confirmStopOpen}
-									action="Stop"
+									action="停止"
 									itemType="container"
 									itemName={displayName || containerId.slice(0, 12)}
-									title="Stop"
+									title="停止"
 									onConfirm={doStop}
 									onOpenChange={(o) => confirmStopOpen = o}
 								>
@@ -744,10 +744,10 @@
 							{#if onRestart}
 								<ConfirmPopover
 									open={confirmRestartOpen}
-									action="Restart"
+									action="重启"
 									itemType="container"
 									itemName={displayName || containerId.slice(0, 12)}
-									title="Restart"
+									title="重启"
 									variant="secondary"
 									onConfirm={doRestart}
 									onOpenChange={(o) => confirmRestartOpen = o}
@@ -762,7 +762,7 @@
 								<button
 									type="button"
 									onclick={doStart}
-									title="Start"
+									title="启动"
 									disabled={starting}
 									class="p-1 rounded hover:bg-muted transition-colors cursor-pointer disabled:opacity-50"
 								>
@@ -774,7 +774,7 @@
 							<button
 								type="button"
 								onclick={doEdit}
-								title="Edit"
+								title="编辑"
 								class="p-1 rounded hover:bg-muted transition-colors cursor-pointer"
 							>
 								<Pencil class="w-4 h-4 text-muted-foreground hover:text-foreground" />
@@ -783,10 +783,10 @@
 						{#if onRemove}
 							<ConfirmPopover
 								open={confirmRemoveOpen}
-								action="Delete"
+								action="删除"
 								itemType="container"
 								itemName={displayName || containerId.slice(0, 12)}
-								title="Delete"
+								title="删除"
 								variant="destructive"
 								onConfirm={doRemove}
 								onOpenChange={(o) => confirmRemoveOpen = o}
@@ -824,7 +824,7 @@
 				<Tabs.Root bind:value={activeTab} class="w-full h-full flex flex-col">
 					<Tabs.List class="w-full justify-start shrink-0 flex-wrap h-auto min-h-10 bg-muted rounded-lg">
 						<Tabs.Trigger value="overview" onclick={() => showLogs = false}>Overview</Tabs.Trigger>
-						<Tabs.Trigger value="logs" onclick={() => showLogs = true}>Logs</Tabs.Trigger>
+						<Tabs.Trigger value="logs" onclick={() => showLogs = true}>日志</Tabs.Trigger>
 						<Tabs.Trigger value="layers" onclick={() => showLogs = false}>Layers</Tabs.Trigger>
 						<Tabs.Trigger value="processes" onclick={() => { showLogs = false; if (processesAutoRefresh) startProcessesCollection(); else fetchProcesses(); }}>Processes</Tabs.Trigger>
 						<Tabs.Trigger value="network" onclick={() => showLogs = false}>Network</Tabs.Trigger>
@@ -1852,7 +1852,7 @@
 		</div>
 
 		<Dialog.Footer class="shrink-0">
-			<Button variant="outline" onclick={() => (open = false)}>Close</Button>
+			<Button variant="outline" onclick={() => (open = false)}>关闭</Button>
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>
@@ -1903,7 +1903,7 @@
 			</div>
 		</div>
 		<Dialog.Footer class="shrink-0">
-			<Button variant="outline" onclick={() => showRawJson = false}>Close</Button>
+			<Button variant="outline" onclick={() => showRawJson = false}>关闭</Button>
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>

@@ -206,7 +206,7 @@
 								<Button
 									variant="ghost"
 									size="sm"
-									title="Test connection"
+									title="测试连接"
 									onclick={() => testOidcConnection(config.id)}
 									disabled={oidcTesting === config.id}
 								>
@@ -239,10 +239,10 @@
 									</Button>
 									<ConfirmPopover
 										open={confirmDeleteOidcId === config.id}
-										action="Delete"
+										action="删除"
 										itemType="OIDC provider"
 										itemName={config.name}
-										title="Delete"
+										title="删除"
 										onConfirm={() => deleteOidcConfig(config.id)}
 										onOpenChange={(open) => confirmDeleteOidcId = open ? config.id : null}
 									>

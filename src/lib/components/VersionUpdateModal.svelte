@@ -301,7 +301,7 @@
 					{/if}
 				</div>
 				<div class="flex gap-2">
-					<Button variant="outline" size="sm" onclick={close}>Close</Button>
+					<Button variant="outline" size="sm" onclick={close}>关闭</Button>
 				</div>
 			</Dialog.Footer>
 		{/if}

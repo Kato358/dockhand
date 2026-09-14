@@ -341,9 +341,7 @@
 					size="sm"
 					class="w-full"
 					onclick={() => handleOpenChange(false)}
-				>
-					Close
-				</Button>
+				>关闭</Button>
 			</div>
 		{/if}
 	</Popover.Content>

@@ -158,17 +158,15 @@
 									size="sm"
 									onclick={() => openCfgModal(cfg)}
 								>
-									<Pencil class="w-3 h-3" />
-									Edit
-								</Button>
+									<Pencil class="w-3 h-3" />编辑</Button>
 							{/if}
 							{#if $canAccess('configsets', 'delete')}
 								<ConfirmPopover
 									open={confirmDeleteConfigSetId === cfg.id}
-									action="Delete"
+									action="删除"
 									itemType="config set"
 									itemName={cfg.name}
-									title="Remove"
+									title="移除"
 									position="left"
 									onConfirm={() => deleteConfigSet(cfg.id)}
 									onOpenChange={(open) => confirmDeleteConfigSetId = open ? cfg.id : null}

@@ -110,11 +110,11 @@
 				<EnvironmentIcon {icon} envId={environmentId} class="w-4 h-4 {online ? 'text-primary' : 'text-muted-foreground'}" />
 			</div>
 			{#if connectionType === 'socket' || !connectionType}
-				<span title="Unix socket connection">
+				<span title="Unix 套接字连接">
 					<Unplug class="w-4 h-4 text-cyan-500 glow-cyan" />
 				</span>
 			{:else if connectionType === 'direct'}
-				<span title="Direct Docker connection">
+				<span title="直连 Docker">
 					<Icon iconNode={whale} class="w-4 h-4 text-blue-500 glow-blue" />
 				</span>
 			{:else if connectionType === 'hawser-standard'}
@@ -152,17 +152,17 @@
 				</span>
 			{/if}
 			{#if scannerEnabled}
-				<span title="Vulnerability scanning enabled">
+				<span title="已启用漏洞扫描">
 					<ShieldCheck class="w-4 h-4 text-green-500 glow-green" />
 				</span>
 			{/if}
 			{#if collectActivity}
-				<span title="Activity collection enabled">
+				<span title="已启用活动采集">
 					<Activity class="w-4 h-4 text-amber-500 glow-amber" />
 				</span>
 			{/if}
 			{#if collectMetrics}
-				<span title="Metrics collection enabled">
+				<span title="已启用指标采集">
 					<Cpu class="w-4 h-4 text-sky-400 glow-sky" />
 				</span>
 			{/if}
@@ -171,7 +171,7 @@
 					onpointerdown={stopPointerPropagation}
 					onclick={openSettings}
 					class="p-0.5 rounded hover:bg-muted transition-colors"
-					title="Edit environment settings"
+					title="编辑环境设置"
 				>
 					<Settings class="w-3.5 h-3.5 text-muted-foreground hover:text-foreground" />
 				</button>

@@ -739,14 +739,14 @@
 			<!-- Connection status indicator -->
 			{#if streamingEnabled}
 				{#if isConnected}
-					<div class="flex items-center gap-1.5 transition-opacity duration-300" title="Connected - Live streaming">
+					<div class="flex items-center gap-1.5 transition-opacity duration-300" title="已连接，实时传输中">
 						<Wifi class="w-3.5 h-3.5 text-green-500" />
 						<span class="text-xs text-green-500 font-medium">Live</span>
 					</div>
 				{:else if loading}
-					<div class="flex items-center gap-1.5 transition-opacity duration-300" title="Connecting...">
+					<div class="flex items-center gap-1.5 transition-opacity duration-300" title="连接中…">
 						<RefreshCw class="w-3.5 h-3.5 animate-spin {darkMode ? 'text-amber-500' : 'text-amber-600'}" />
-						<span class="text-xs {darkMode ? 'text-amber-500' : 'text-amber-600'}">Connecting...</span>
+						<span class="text-xs {darkMode ? 'text-amber-500' : 'text-amber-600'}">连接中…</span>
 					</div>
 				{:else if connectionError}
 					<button
@@ -768,7 +768,7 @@
 					</button>
 				{/if}
 			{:else}
-				<div class="flex items-center gap-1.5 transition-opacity duration-300" title="Streaming paused">
+				<div class="flex items-center gap-1.5 transition-opacity duration-300" title="已暂停传输">
 					<Pause class="w-3.5 h-3.5 {darkMode ? 'text-zinc-500' : 'text-gray-400'}" />
 					<span class="text-xs {darkMode ? 'text-zinc-500' : 'text-gray-400'}">Paused</span>
 				</div>
@@ -791,7 +791,7 @@
 			</button>
 			<!-- Tail lines selector -->
 			<Select.Root type="single" value={tailCount} onValueChange={(v) => { tailCount = v; saveSettings(); reloadLogs(); }}>
-				<Select.Trigger size="sm" class="!h-auto !py-0.5 w-[52px] text-xs px-1.5 {darkMode ? 'bg-zinc-800 border-zinc-700 text-zinc-300' : 'bg-white border-gray-300 text-gray-700'} [&_svg]:size-3" title="Number of log lines to load">
+				<Select.Trigger size="sm" class="!h-auto !py-0.5 w-[52px] text-xs px-1.5 {darkMode ? 'bg-zinc-800 border-zinc-700 text-zinc-300' : 'bg-white border-gray-300 text-gray-700'} [&_svg]:size-3" title="加载的日志行数">
 					<span>{tailOptions.find(o => o.value === tailCount)?.label ?? tailCount}</span>
 				</Select.Trigger>
 				<Select.Content>
@@ -814,7 +814,7 @@
 			<button
 				onclick={toggleAutoScroll}
 				class="flex items-center gap-1 px-1.5 py-0.5 rounded text-xs transition-colors {autoScroll ? (darkMode ? 'bg-amber-500/20 ring-1 ring-amber-500/50 text-amber-400' : 'bg-amber-500/30 ring-1 ring-amber-600/50 text-amber-700') : darkMode ? 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-300'}"
-				title="Toggle auto-scroll"
+				title="切换自动滚动"
 			>
 				<ArrowDownToLine class="w-3 h-3" />
 			</button>
@@ -833,7 +833,7 @@
 			<button
 				onclick={toggleWordWrap}
 				class="p-1 rounded transition-colors {wordWrap ? (darkMode ? 'bg-amber-500/20 ring-1 ring-amber-500/50' : 'bg-amber-500/30 ring-1 ring-amber-600/50') : ''} {darkMode ? 'hover:bg-zinc-800' : 'hover:bg-gray-300'}"
-				title="Toggle word wrap"
+				title="切换自动换行"
 			>
 				<WrapText class="w-3 h-3 transition-colors {wordWrap ? (darkMode ? 'text-amber-400' : 'text-amber-700') : darkMode ? 'text-zinc-500 hover:text-zinc-300' : 'text-gray-500 hover:text-gray-700'}" />
 			</button>
@@ -880,7 +880,7 @@
 					<input
 						bind:this={logSearchInputRef}
 						type="text"
-						placeholder="Search..."
+						placeholder="搜索…"
 						bind:value={logSearchQuery}
 						onkeydown={handleLogSearchKeydown}
 						class="bg-transparent border-none outline-none text-xs w-20 {darkMode ? 'text-zinc-200 placeholder:text-zinc-500' : 'text-gray-800 placeholder:text-gray-400'}"
@@ -903,7 +903,7 @@
 					<button onclick={() => navigateMatch('next')} class="p-0.5 rounded {darkMode ? 'hover:bg-zinc-700' : 'hover:bg-gray-300'}" title="Next">
 						<ChevronDown class="w-3 h-3 {darkMode ? 'text-zinc-400' : 'text-gray-500'}" />
 					</button>
-					<button onclick={closeLogSearch} class="p-0.5 rounded {darkMode ? 'hover:bg-zinc-700' : 'hover:bg-gray-300'}" title="Close">
+					<button onclick={closeLogSearch} class="p-0.5 rounded {darkMode ? 'hover:bg-zinc-700' : 'hover:bg-gray-300'}" title="关闭">
 						<X class="w-3 h-3 {darkMode ? 'text-zinc-400' : 'text-gray-500'}" />
 					</button>
 				</div>
@@ -911,7 +911,7 @@
 				<button
 					onclick={toggleLogSearch}
 					class="p-1 rounded transition-colors {darkMode ? 'hover:bg-zinc-800' : 'hover:bg-gray-300'}"
-					title="Search logs"
+					title="搜索日志"
 				>
 					<Search class="w-3 h-3 {darkMode ? 'text-zinc-500 hover:text-zinc-300' : 'text-gray-500 hover:text-gray-700'}" />
 				</button>
@@ -920,7 +920,7 @@
 			<button
 				onclick={copyLogs}
 				class="p-1 rounded transition-colors {darkMode ? 'hover:bg-zinc-800' : 'hover:bg-gray-300'}"
-				title="Copy logs"
+				title="复制日志"
 			>
 				<Copy class="w-3 h-3 {darkMode ? 'text-zinc-500 hover:text-zinc-300' : 'text-gray-500 hover:text-gray-700'}" />
 			</button>
@@ -928,7 +928,7 @@
 			<button
 				onclick={downloadLogs}
 				class="p-1 rounded transition-colors {darkMode ? 'hover:bg-zinc-800' : 'hover:bg-gray-300'}"
-				title="Download logs"
+				title="下载日志"
 			>
 				<Download class="w-3 h-3 {darkMode ? 'text-zinc-500 hover:text-zinc-300' : 'text-gray-500 hover:text-gray-700'}" />
 			</button>
@@ -936,7 +936,7 @@
 			<button
 				onclick={clearLogs}
 				class="p-1 rounded transition-colors {darkMode ? 'hover:bg-zinc-800' : 'hover:bg-gray-300'}"
-				title="Clear logs"
+				title="清空日志"
 			>
 				<Eraser class="w-3 h-3 {darkMode ? 'text-zinc-500 hover:text-zinc-300' : 'text-gray-500 hover:text-gray-700'}" />
 			</button>
@@ -944,7 +944,7 @@
 			<button
 				onclick={fetchLogs}
 				class="p-1 rounded transition-colors {darkMode ? 'hover:bg-zinc-800' : 'hover:bg-gray-300'}"
-				title="Refresh logs"
+				title="刷新日志"
 			>
 				<RefreshCw class="w-3 h-3 {darkMode ? 'text-zinc-500 hover:text-zinc-300' : 'text-gray-500 hover:text-gray-700'}" />
 			</button>

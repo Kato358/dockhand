@@ -199,7 +199,7 @@
 				</div>
 			</div>
 			<Dialog.Footer>
-				<Button variant="outline" onclick={onClose}>Cancel</Button>
+				<Button variant="outline" onclick={onClose}>取消</Button>
 				<Button onclick={verifyAndEnableMfa} disabled={loading || !token}>
 					{#if loading}
 						<RefreshCw class="w-4 h-4 animate-spin" />

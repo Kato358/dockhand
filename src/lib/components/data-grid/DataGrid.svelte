@@ -712,7 +712,7 @@
 					<th class="text-right py-2 px-2 font-medium actions-col" style="width: {getDisplayWidth(colId)}px">
 						{#if colId === 'actions'}
 							<div class="flex items-center justify-end gap-1">
-								<span>Actions</span>
+								<span>操作</span>
 								<ColumnSettingsPopover {gridId} />
 							</div>
 						{/if}
@@ -850,7 +850,7 @@
 				<th class="text-right py-2 px-2 font-medium actions-col" style="width: {getDisplayWidth(colId)}px">
 					{#if colId === 'actions'}
 						<div class="flex items-center justify-end gap-1">
-							<span>Actions</span>
+							<span>操作</span>
 							<ColumnSettingsPopover {gridId} />
 						</div>
 					{:else if headerCell}

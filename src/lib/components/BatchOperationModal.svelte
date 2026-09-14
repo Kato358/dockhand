@@ -303,9 +303,7 @@
 				</div>
 			</div>
 			{#if isRunning}
-				<Button variant="outline" size="sm" onclick={handleCancel}>
-					Cancel
-				</Button>
+				<Button variant="outline" size="sm" onclick={handleCancel}>取消</Button>
 			{:else}
 				<Button size="sm" onclick={handleOk}>
 					OK

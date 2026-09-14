@@ -503,7 +503,7 @@
 
 <div class="flex-1 min-h-0 flex flex-col gap-3 overflow-hidden">
 	<div class="shrink-0 flex flex-wrap justify-between items-center gap-3 min-h-8">
-		<PageHeader icon={Network} title="Networks" count={networks.length} />
+		<PageHeader icon={Network} title="网络" count={networks.length} />
 		<div class="flex flex-wrap items-center gap-2">
 			<div class="relative">
 				<Search class="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
@@ -588,7 +588,7 @@
 			{#if $canAccess('networks', 'remove')}
 			<ConfirmPopover
 				open={confirmBulkRemove}
-				action="Delete"
+				action="删除"
 				itemType="{selectedInFilter.length} network{selectedInFilter.length !== 1 ? 's' : ''}"
 				title="Delete {selectedInFilter.length}"
 				unstyled
@@ -597,9 +597,7 @@
 			>
 				{#snippet children({ open })}
 					<span class="inline-flex items-center gap-1 px-1.5 py-0 rounded border border-border hover:text-destructive hover:border-destructive/40 hover:shadow transition-all cursor-pointer">
-						<Trash2 class="w-3 h-3" />
-						Delete
-					</span>
+						<Trash2 class="w-3 h-3" />删除</span>
 				{/snippet}
 			</ConfirmPopover>
 			{/if}
@@ -667,7 +665,7 @@
 						<button
 							type="button"
 							onclick={() => inspectNetwork(network)}
-							title="View details"
+							title="查看详情"
 							class="p-1 rounded hover:bg-muted transition-colors opacity-70 hover:opacity-100 cursor-pointer"
 						>
 							<Eye class="grid-action-icon grid-action-info text-muted-foreground hover:text-foreground" />
@@ -704,10 +702,10 @@
 						{#if !isProtected && $canAccess('networks', 'remove')}
 						<ConfirmPopover
 							open={confirmDeleteId === network.id}
-							action="Delete"
+							action="删除"
 							itemType="network"
 							itemName={network.name}
-							title="Remove"
+							title="移除"
 							onConfirm={() => removeNetwork(network.id, network.name)}
 							onOpenChange={(open) => confirmDeleteId = open ? network.id : null}
 						>

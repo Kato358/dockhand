@@ -587,7 +587,7 @@
 
 <div class="h-full flex flex-col gap-3 overflow-hidden">
 	<div class="shrink-0 flex flex-wrap justify-between items-center gap-3 min-h-8">
-		<PageHeader icon={Download} title="Registry" showConnection={false} />
+		<PageHeader icon={Download} title="镜像仓库" showConnection={false} />
 		{#if $canAccess('registries', 'edit')}
 		<a href="/settings?tab=registries" class="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-8 rounded-md px-3 text-xs">
 			<Settings2 class="w-4 h-4" />
@@ -771,7 +771,7 @@
 														<th class="text-left py-1 px-2 pr-4 font-medium">Tag</th>
 														<th class="text-left py-1 px-2 pr-4 font-medium">Size</th>
 														<th class="text-left py-1 px-2 pr-4 font-medium">Modified</th>
-														<th class="text-left py-1 px-2 font-medium">Actions</th>
+														<th class="text-left py-1 px-2 font-medium">操作</th>
 													</tr>
 												</thead>
 												<tbody>
@@ -820,7 +820,7 @@
 																		<ConfirmPopover
 																			title="Delete tag"
 																			description="Are you sure you want to delete {result.name}:{tag.name}? This cannot be undone."
-																			confirmText="Delete"
+																			confirmText="删除"
 																			open={confirmDeleteKey === deleteKey}
 																			onConfirm={() => deleteTag(result.name, tag.name)}
 																			onOpenChange={(open) => confirmDeleteKey = open ? deleteKey : null}

@@ -30,12 +30,12 @@
 		</span>
 	{/if}
 	{#if scannerEnabled}
-		<span title="Vulnerability scanning enabled">
+		<span title="已启用漏洞扫描">
 			<ShieldCheck class="{compact ? 'w-3.5 h-3.5 glow-green-sm' : 'w-4 h-4 glow-green'} text-green-500" />
 		</span>
 	{/if}
 	{#if collectActivity}
-		<span title="Activity collection enabled">
+		<span title="已启用活动采集">
 			<Activity class="{compact ? 'w-3.5 h-3.5 glow-amber-sm' : 'w-4 h-4 glow-amber'} text-amber-500" />
 		</span>
 	{/if}

@@ -588,7 +588,7 @@
 				class="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-30"
 			>
 				<X class="h-4 w-4" />
-				<span class="sr-only">Close</span>
+				<span class="sr-only">关闭</span>
 			</button>
 		</Dialog.Header>
 
@@ -759,9 +759,7 @@
 				{/if}
 			</div>
 			<div class="flex gap-2">
-				<Button type="button" variant="outline" onclick={handleClose} disabled={loading || isPulling || isScanning}>
-					Cancel
-				</Button>
+				<Button type="button" variant="outline" onclick={handleClose} disabled={loading || isPulling || isScanning}>取消</Button>
 				<Button type="button" disabled={loading || isPulling || isScanning || activeTab !== 'container'} onclick={handleSubmit}>
 					{#if loading}
 						<Loader2 class="w-4 h-4 animate-spin" />

@@ -1599,14 +1599,14 @@ import type { FavoriteGroup } from '../api/preferences/favorite-groups/+server';
 
 {#if $environments.length === 0 || !$currentEnvironment}
 	<div class="flex flex-col flex-1 min-h-0 h-full">
-		<PageHeader icon={ScrollText} title="Logs" class="h-9 mb-3" />
+		<PageHeader icon={ScrollText} title="日志" class="h-9 mb-3" />
 		<NoEnvironment />
 	</div>
 {:else}
 <div class="flex flex-col flex-1 min-h-0 h-full gap-3">
 	<!-- Header with container selector -->
 	<div class="flex items-center gap-4 h-9">
-		<PageHeader icon={ScrollText} title="Logs" />
+		<PageHeader icon={ScrollText} title="日志" />
 		<!-- Layout toggle - fixed position after title -->
 		<ToggleGroup
 			bind:value={layoutMode}
@@ -1930,7 +1930,7 @@ import type { FavoriteGroup } from '../api/preferences/favorite-groups/+server';
 										onclick={saveCurrentGroup}
 										disabled={!newGroupName.trim()}
 										class="h-6 w-6 flex items-center justify-center rounded hover:bg-green-500/20 text-muted-foreground hover:text-green-500 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-										title="Save"
+										title="保存"
 									>
 										<Check class="w-3.5 h-3.5" />
 									</button>
@@ -1938,7 +1938,7 @@ import type { FavoriteGroup } from '../api/preferences/favorite-groups/+server';
 										type="button"
 										onclick={() => { showSaveGroupInput = false; newGroupName = ''; }}
 										class="h-6 w-6 flex items-center justify-center rounded hover:bg-red-500/20 text-muted-foreground hover:text-red-500 transition-colors"
-										title="Cancel"
+										title="取消"
 									>
 										<X class="w-3.5 h-3.5" />
 									</button>
@@ -1993,14 +1993,14 @@ import type { FavoriteGroup } from '../api/preferences/favorite-groups/+server';
 						<div class="flex items-center gap-2 shrink-0">
 							{#if streamingEnabled}
 								{#if isConnected}
-									<div class="flex items-center gap-1.5" title="Connected - Live streaming">
+									<div class="flex items-center gap-1.5" title="已连接，实时传输中">
 										<Wifi class="w-3.5 h-3.5 text-green-500" />
 										<span class="text-xs text-green-500 font-medium">Live</span>
 									</div>
 								{:else if loading}
-									<div class="flex items-center gap-1.5" title="Connecting...">
+									<div class="flex items-center gap-1.5" title="连接中…">
 										<RefreshCw class="w-3.5 h-3.5 animate-spin {darkMode ? 'text-amber-500' : 'text-amber-600'}" />
-										<span class="text-xs {darkMode ? 'text-amber-500' : 'text-amber-600'}">Connecting...</span>
+										<span class="text-xs {darkMode ? 'text-amber-500' : 'text-amber-600'}">连接中…</span>
 									</div>
 								{:else if connectionError}
 									<button onclick={retryConnection} class="flex items-center gap-1.5 hover:opacity-80" title={connectionError}>
@@ -2009,7 +2009,7 @@ import type { FavoriteGroup } from '../api/preferences/favorite-groups/+server';
 									</button>
 								{/if}
 							{:else}
-								<div class="flex items-center gap-1.5" title="Streaming paused">
+								<div class="flex items-center gap-1.5" title="已暂停传输">
 									<Pause class="w-3.5 h-3.5 {darkMode ? 'text-zinc-500' : 'text-gray-400'}" />
 									<span class="text-xs {darkMode ? 'text-zinc-500' : 'text-gray-400'}">Paused</span>
 								</div>
@@ -2051,14 +2051,14 @@ import type { FavoriteGroup } from '../api/preferences/favorite-groups/+server';
 							<button
 								onclick={() => { autoScroll = !autoScroll; saveState(); }}
 								class="flex items-center gap-1.5 px-2 py-1 rounded text-xs transition-colors {autoScroll ? (darkMode ? 'bg-amber-500/20 ring-1 ring-amber-500/50 text-amber-400' : 'bg-amber-500/30 ring-1 ring-amber-600/50 text-amber-700') : darkMode ? 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-200'}"
-								title="Toggle auto-scroll"
+								title="切换自动滚动"
 							>
 								<ArrowDownToLine class="w-3 h-3" />
 								<span>Auto-scroll</span>
 							</button>
 							<!-- Tail lines selector -->
 							<Select.Root type="single" value={tailCount} onValueChange={(v) => { tailCount = v; saveState(); reloadAllLogs(); }}>
-								<Select.Trigger class="!h-7 w-[52px] text-xs px-2 [&_svg]:size-3 {darkMode ? 'bg-zinc-800 border-zinc-700 text-zinc-300' : 'bg-white border-gray-300 text-gray-700'}" title="Number of log lines to load">
+								<Select.Trigger class="!h-7 w-[52px] text-xs px-2 [&_svg]:size-3 {darkMode ? 'bg-zinc-800 border-zinc-700 text-zinc-300' : 'bg-white border-gray-300 text-gray-700'}" title="加载的日志行数">
 									<span>{tailOptions.find(o => o.value === tailCount)?.label ?? tailCount}</span>
 								</Select.Trigger>
 								<Select.Content>
@@ -2090,7 +2090,7 @@ import type { FavoriteGroup } from '../api/preferences/favorite-groups/+server';
 							<button
 								onclick={() => { wordWrap = !wordWrap; saveState(); }}
 								class="flex items-center gap-1.5 px-2 py-1 rounded text-xs transition-colors {wordWrap ? (darkMode ? 'bg-amber-500/20 ring-1 ring-amber-500/50 text-amber-400' : 'bg-amber-500/30 ring-1 ring-amber-600/50 text-amber-700') : darkMode ? 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-200'}"
-								title="Toggle word wrap"
+								title="切换自动换行"
 							>
 								<WrapText class="w-3 h-3" />
 								<span>Wrap</span>
@@ -2129,7 +2129,7 @@ import type { FavoriteGroup } from '../api/preferences/favorite-groups/+server';
 									<input
 										bind:this={logSearchInputRef}
 										type="text"
-										placeholder="Search..."
+										placeholder="搜索…"
 										bind:value={logSearchQuery}
 										onkeydown={handleLogSearchKeydown}
 										class="bg-transparent border-none outline-none text-xs w-28 {darkMode ? 'text-zinc-200 placeholder:text-zinc-500' : 'text-gray-800 placeholder:text-gray-400'}"
@@ -2157,17 +2157,17 @@ import type { FavoriteGroup } from '../api/preferences/favorite-groups/+server';
 									</button>
 								</div>
 							{:else}
-								<button onclick={toggleLogSearch} class="p-1 rounded transition-colors {darkMode ? 'hover:bg-zinc-800' : 'hover:bg-gray-200'}" title="Search logs">
+								<button onclick={toggleLogSearch} class="p-1 rounded transition-colors {darkMode ? 'hover:bg-zinc-800' : 'hover:bg-gray-200'}" title="搜索日志">
 									<Search class="w-3 h-3 {darkMode ? 'text-zinc-500 hover:text-zinc-300' : 'text-gray-500 hover:text-gray-700'}" />
 								</button>
 							{/if}
-							<button onclick={copyLogs} class="p-1 rounded transition-colors {darkMode ? 'hover:bg-zinc-800' : 'hover:bg-gray-200'}" title="Copy logs">
+							<button onclick={copyLogs} class="p-1 rounded transition-colors {darkMode ? 'hover:bg-zinc-800' : 'hover:bg-gray-200'}" title="复制日志">
 								<Copy class="w-3 h-3 {darkMode ? 'text-zinc-500 hover:text-zinc-300' : 'text-gray-500 hover:text-gray-700'}" />
 							</button>
-							<button onclick={downloadLogs} class="p-1 rounded transition-colors {darkMode ? 'hover:bg-zinc-800' : 'hover:bg-gray-200'}" title="Download logs">
+							<button onclick={downloadLogs} class="p-1 rounded transition-colors {darkMode ? 'hover:bg-zinc-800' : 'hover:bg-gray-200'}" title="下载日志">
 								<Download class="w-3 h-3 {darkMode ? 'text-zinc-500 hover:text-zinc-300' : 'text-gray-500 hover:text-gray-700'}" />
 							</button>
-							<button onclick={clearLogs} class="p-1 rounded transition-colors {darkMode ? 'hover:bg-zinc-800' : 'hover:bg-gray-200'}" title="Clear logs">
+							<button onclick={clearLogs} class="p-1 rounded transition-colors {darkMode ? 'hover:bg-zinc-800' : 'hover:bg-gray-200'}" title="清空日志">
 								<Eraser class="w-3 h-3 {darkMode ? 'text-zinc-500 hover:text-zinc-300' : 'text-gray-500 hover:text-gray-700'}" />
 							</button>
 						</div>
@@ -2196,14 +2196,14 @@ import type { FavoriteGroup } from '../api/preferences/favorite-groups/+server';
 					<!-- Connection status indicator -->
 					{#if streamingEnabled}
 						{#if isConnected}
-							<div class="flex items-center gap-1.5 transition-opacity duration-300" title="Connected - Live streaming">
+							<div class="flex items-center gap-1.5 transition-opacity duration-300" title="已连接，实时传输中">
 								<Wifi class="w-3.5 h-3.5 text-green-500" />
 								<span class="text-xs text-green-500 font-medium">Live</span>
 							</div>
 						{:else if loading}
-							<div class="flex items-center gap-1.5 transition-opacity duration-300" title="Connecting...">
+							<div class="flex items-center gap-1.5 transition-opacity duration-300" title="连接中…">
 								<RefreshCw class="w-3.5 h-3.5 animate-spin {darkMode ? 'text-amber-500' : 'text-amber-600'}" />
-								<span class="text-xs {darkMode ? 'text-amber-500' : 'text-amber-600'}">Connecting...</span>
+								<span class="text-xs {darkMode ? 'text-amber-500' : 'text-amber-600'}">连接中…</span>
 							</div>
 						{:else if connectionError}
 							<button
@@ -2221,7 +2221,7 @@ import type { FavoriteGroup } from '../api/preferences/favorite-groups/+server';
 							</div>
 						{/if}
 					{:else}
-						<div class="flex items-center gap-1.5 transition-opacity duration-300" title="Streaming paused">
+						<div class="flex items-center gap-1.5 transition-opacity duration-300" title="已暂停传输">
 							<Pause class="w-3.5 h-3.5 {darkMode ? 'text-zinc-500' : 'text-gray-400'}" />
 							<span class="text-xs {darkMode ? 'text-zinc-500' : 'text-gray-400'}">Paused</span>
 						</div>
@@ -2271,14 +2271,14 @@ import type { FavoriteGroup } from '../api/preferences/favorite-groups/+server';
 					<button
 						onclick={() => { autoScroll = !autoScroll; saveState(); }}
 						class="flex items-center gap-1.5 px-2 py-1 rounded text-xs transition-colors {autoScroll ? (darkMode ? 'bg-amber-500/20 ring-1 ring-amber-500/50 text-amber-400' : 'bg-amber-500/30 ring-1 ring-amber-600/50 text-amber-700') : darkMode ? 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-200'}"
-						title="Toggle auto-scroll"
+						title="切换自动滚动"
 					>
 						<ArrowDownToLine class="w-3 h-3" />
 						<span>Auto-scroll</span>
 					</button>
 					<!-- Tail lines selector -->
 					<Select.Root type="single" value={tailCount} onValueChange={(v) => { tailCount = v; saveState(); reloadAllLogs(); }}>
-						<Select.Trigger class="!h-7 w-[52px] text-xs px-2 [&_svg]:size-3 {darkMode ? 'bg-zinc-800 border-zinc-700 text-zinc-300' : 'bg-white border-gray-300 text-gray-700'}" title="Number of log lines to load">
+						<Select.Trigger class="!h-7 w-[52px] text-xs px-2 [&_svg]:size-3 {darkMode ? 'bg-zinc-800 border-zinc-700 text-zinc-300' : 'bg-white border-gray-300 text-gray-700'}" title="加载的日志行数">
 							<span>{tailOptions.find(o => o.value === tailCount)?.label ?? tailCount}</span>
 						</Select.Trigger>
 						<Select.Content>
@@ -2310,7 +2310,7 @@ import type { FavoriteGroup } from '../api/preferences/favorite-groups/+server';
 					<button
 						onclick={() => { wordWrap = !wordWrap; saveState(); }}
 						class="flex items-center gap-1.5 px-2 py-1 rounded text-xs transition-colors {wordWrap ? (darkMode ? 'bg-amber-500/20 ring-1 ring-amber-500/50 text-amber-400' : 'bg-amber-500/30 ring-1 ring-amber-600/50 text-amber-700') : darkMode ? 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-200'}"
-						title="Toggle word wrap"
+						title="切换自动换行"
 					>
 						<WrapText class="w-3 h-3" />
 						<span>Wrap</span>
@@ -2357,7 +2357,7 @@ import type { FavoriteGroup } from '../api/preferences/favorite-groups/+server';
 							<input
 								bind:this={logSearchInputRef}
 								type="text"
-								placeholder="Search..."
+								placeholder="搜索…"
 								bind:value={logSearchQuery}
 								onkeydown={handleLogSearchKeydown}
 								class="bg-transparent border-none outline-none text-xs w-28 {darkMode ? 'text-zinc-200 placeholder:text-zinc-500' : 'text-gray-800 placeholder:text-gray-400'}"
@@ -2408,28 +2408,28 @@ import type { FavoriteGroup } from '../api/preferences/favorite-groups/+server';
 					<button
 						onclick={copyLogs}
 						class="p-1 rounded transition-colors {darkMode ? 'hover:bg-zinc-800' : 'hover:bg-gray-200'}"
-						title="Copy logs"
+						title="复制日志"
 					>
 						<Copy class="w-3 h-3 {darkMode ? 'text-zinc-500 hover:text-zinc-300' : 'text-gray-500 hover:text-gray-700'}" />
 					</button>
 					<button
 						onclick={downloadLogs}
 						class="p-1 rounded transition-colors {darkMode ? 'hover:bg-zinc-800' : 'hover:bg-gray-200'}"
-						title="Download logs"
+						title="下载日志"
 					>
 						<Download class="w-3 h-3 {darkMode ? 'text-zinc-500 hover:text-zinc-300' : 'text-gray-500 hover:text-gray-700'}" />
 					</button>
 					<button
 						onclick={clearLogs}
 						class="p-1 rounded transition-colors {darkMode ? 'hover:bg-zinc-800' : 'hover:bg-gray-200'}"
-						title="Clear logs"
+						title="清空日志"
 					>
 						<Eraser class="w-3 h-3 {darkMode ? 'text-zinc-500 hover:text-zinc-300' : 'text-gray-500 hover:text-gray-700'}" />
 					</button>
 					<button
 						onclick={() => fetchLogs()}
 						class="p-1 rounded transition-colors {darkMode ? 'hover:bg-zinc-800' : 'hover:bg-gray-200'}"
-						title="Refresh logs"
+						title="刷新日志"
 					>
 						<RefreshCw class="w-3 h-3 {darkMode ? 'text-zinc-500 hover:text-zinc-300' : 'text-gray-500 hover:text-gray-700'}" />
 					</button>

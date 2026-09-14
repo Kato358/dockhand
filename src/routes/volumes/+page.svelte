@@ -422,7 +422,7 @@
 
 <div class="flex-1 min-h-0 flex flex-col gap-3 overflow-hidden">
 	<div class="shrink-0 flex flex-wrap justify-between items-center gap-3 min-h-8">
-		<PageHeader icon={HardDrive} title="Volumes" count={volumes.length} />
+		<PageHeader icon={HardDrive} title="存储卷" count={volumes.length} />
 		<div class="flex flex-wrap items-center gap-2">
 			<div class="relative">
 				<Search class="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
@@ -502,7 +502,7 @@
 			{#if $canAccess('volumes', 'remove')}
 			<ConfirmPopover
 				open={confirmBulkRemove}
-				action="Delete"
+				action="删除"
 				itemType="{selectedInFilter.length} volume{selectedInFilter.length !== 1 ? 's' : ''}"
 				title="Delete {selectedInFilter.length}"
 				unstyled
@@ -511,9 +511,7 @@
 			>
 				{#snippet children({ open })}
 					<span class="inline-flex items-center gap-1 px-1.5 py-0 rounded border border-border hover:text-destructive hover:border-destructive/40 hover:shadow transition-all cursor-pointer">
-						<Trash2 class="w-3 h-3" />
-						Delete
-					</span>
+						<Trash2 class="w-3 h-3" />删除</span>
 				{/snippet}
 			</ConfirmPopover>
 			{/if}
@@ -598,7 +596,7 @@
 						<button
 							type="button"
 							onclick={() => inspectVolume(volume.name)}
-							title="View details"
+							title="查看详情"
 							class="p-1 rounded hover:bg-muted transition-colors opacity-70 hover:opacity-100 cursor-pointer"
 						>
 							<Eye class="grid-action-icon grid-action-info text-muted-foreground hover:text-foreground" />
@@ -606,7 +604,7 @@
 						<button
 							type="button"
 							onclick={() => browseVolume(volume.name)}
-							title="Browse files"
+							title="浏览文件"
 							class="p-1 rounded hover:bg-muted transition-colors opacity-70 hover:opacity-100 cursor-pointer"
 						>
 							<FolderOpen class="grid-action-icon grid-action-info text-muted-foreground hover:text-foreground" />
@@ -635,10 +633,10 @@
 						<div class="relative">
 							<ConfirmPopover
 								open={confirmDeleteName === volume.name}
-								action="Delete"
+								action="删除"
 								itemType="volume"
 								itemName={volume.name}
-								title="Remove"
+								title="移除"
 								onConfirm={() => removeVolume(volume.name)}
 								onOpenChange={(open) => confirmDeleteName = open ? volume.name : null}
 							>

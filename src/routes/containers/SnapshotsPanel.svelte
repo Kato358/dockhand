@@ -363,7 +363,7 @@
 					<th class="py-1.5 pl-2 font-medium">Taken</th>
 					<th class="py-1.5 pl-2 font-medium">Added</th>
 					<th class="py-1.5 pl-2 font-medium">Repository</th>
-					<th class="py-1.5 pr-3 text-right font-medium">Actions</th>
+					<th class="py-1.5 pr-3 text-right font-medium">操作</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -388,7 +388,7 @@
 										<ArrowLeftRight class="h-3 w-3 {isDiffPending ? 'text-primary' : 'text-muted-foreground'}" />
 									</button>
 								{/if}
-								<button type="button" class="rounded p-1 transition-colors hover:bg-muted" onclick={() => openBrowser(s)} title="Browse files">
+								<button type="button" class="rounded p-1 transition-colors hover:bg-muted" onclick={() => openBrowser(s)} title="浏览文件">
 									<FolderOpen class="h-3 w-3 text-muted-foreground" />
 								</button>
 								<button type="button" class="rounded p-1 transition-colors hover:bg-muted" onclick={() => openRestore(s)} title="Restore">
@@ -396,7 +396,7 @@
 								</button>
 								<ConfirmPopover
 									open={confirmDeleteSnapshot === s.id}
-									action="Delete"
+									action="删除"
 									itemType="snapshot"
 									itemName={s.shortId}
 									title="Delete snapshot"

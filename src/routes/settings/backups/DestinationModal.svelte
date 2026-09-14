@@ -970,10 +970,10 @@
 					</span>
 				{/if}
 			</div>
-			<Button variant="outline" onclick={() => { open = false; onClose(); }}>Cancel</Button>
+			<Button variant="outline" onclick={() => { open = false; onClose(); }}>取消</Button>
 			<Button onclick={save} disabled={formSaving || !formValid} variant={repoConflictName ? 'destructive' : 'default'} title={!formValid ? 'Fill in all required fields first' : undefined}>
 				{#if formSaving}<Loader2 class="w-4 h-4 mr-1 animate-spin" />{:else if repoConflictName}<AlertTriangle class="w-4 h-4 mr-1" />{:else if isEditing}<Check class="w-4 h-4 mr-1" />{:else}<Plus class="w-4 h-4 mr-1" />{/if}
-				{repoConflictName ? 'Save anyway' : needsInit && !isEditing ? 'Create and init' : isEditing ? 'Save' : 'Create'}
+				{repoConflictName ? 'Save anyway' : needsInit && !isEditing ? 'Create and init' : isEditing ? '保存' : 'Create'}
 			</Button>
 		</Dialog.Footer>
 	</Dialog.Content>

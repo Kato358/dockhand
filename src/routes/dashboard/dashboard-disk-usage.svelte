@@ -28,9 +28,9 @@
 	// Pie chart data - only include non-zero values
 	const pieData = $derived(
 		[
-			{ key: 'images', label: 'Images', value: imagesSize, color: '#0ea5e9' },
-			{ key: 'containers', label: 'Containers', value: containersSize, color: '#10b981' },
-			{ key: 'volumes', label: 'Volumes', value: volumesSize, color: '#f59e0b' },
+			{ key: 'images', label: '镜像', value: imagesSize, color: '#0ea5e9' },
+			{ key: 'containers', label: '容器', value: containersSize, color: '#10b981' },
+			{ key: 'volumes', label: '存储卷', value: volumesSize, color: '#f59e0b' },
 			{ key: 'buildCache', label: 'Build cache', value: buildCacheSize, color: '#8b5cf6' }
 		].filter(d => d.value > 0)
 	);
@@ -58,13 +58,13 @@
 			<div class="flex items-center gap-1.5">
 				<div class="w-2 h-2 rounded-full bg-muted shrink-0"></div>
 				<Image class="w-3 h-3 text-muted-foreground/50 shrink-0" />
-				<span class="text-muted-foreground/50">Images</span>
+				<span class="text-muted-foreground/50">镜像</span>
 				<div class="skeleton w-10 h-3 rounded ml-auto"></div>
 			</div>
 			<div class="flex items-center gap-1.5">
 				<div class="w-2 h-2 rounded-full bg-muted shrink-0"></div>
 				<Database class="w-3 h-3 text-muted-foreground/50 shrink-0" />
-				<span class="text-muted-foreground/50">Volumes</span>
+				<span class="text-muted-foreground/50">存储卷</span>
 				<div class="skeleton w-10 h-3 rounded ml-auto"></div>
 			</div>
 		</div>
@@ -160,7 +160,7 @@
 				<div class="flex items-center gap-1.5">
 					<div class="w-2 h-2 rounded-full bg-sky-500 shrink-0"></div>
 					<Image class="w-3 h-3 text-muted-foreground shrink-0" />
-					<span class="text-muted-foreground truncate">Images</span>
+					<span class="text-muted-foreground truncate">镜像</span>
 					<span class="ml-auto font-medium tabular-nums">{formatBytes(imagesSize)}</span>
 				</div>
 			{/if}
@@ -168,7 +168,7 @@
 				<div class="flex items-center gap-1.5">
 					<div class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></div>
 					<Box class="w-3 h-3 text-muted-foreground shrink-0" />
-					<span class="text-muted-foreground truncate">Containers</span>
+					<span class="text-muted-foreground truncate">容器</span>
 					<span class="ml-auto font-medium tabular-nums">{formatBytes(containersSize)}</span>
 				</div>
 			{/if}
@@ -176,7 +176,7 @@
 				<div class="flex items-center gap-1.5">
 					<div class="w-2 h-2 rounded-full bg-amber-500 shrink-0"></div>
 					<Database class="w-3 h-3 text-muted-foreground shrink-0" />
-					<span class="text-muted-foreground truncate">Volumes</span>
+					<span class="text-muted-foreground truncate">存储卷</span>
 					<span class="ml-auto font-medium tabular-nums">{formatBytes(volumesSize)}</span>
 				</div>
 			{/if}

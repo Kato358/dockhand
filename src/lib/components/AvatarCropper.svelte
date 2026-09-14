@@ -277,9 +277,7 @@
 					onclick={handleCancel}
 					disabled={saving}
 				>
-					<X class="w-4 h-4" />
-					Cancel
-				</Button>
+					<X class="w-4 h-4" />取消</Button>
 				<Button
 					class="flex-1"
 					onclick={handleSave}

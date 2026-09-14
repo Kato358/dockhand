@@ -107,7 +107,7 @@
 		compare('Memory', a.hostConfig?.Memory, b.hostConfig?.Memory);
 		compare('CpuShares', a.hostConfig?.CpuShares, b.hostConfig?.CpuShares);
 		compare('Mounts', a.mounts?.length, b.mounts?.length);
-		compare('Networks', Object.keys(a.networkSettings?.Networks || {}), Object.keys(b.networkSettings?.Networks || {}));
+		compare('网络', Object.keys(a.networkSettings?.Networks || {}), Object.keys(b.networkSettings?.Networks || {}));
 
 		return diffs;
 	});

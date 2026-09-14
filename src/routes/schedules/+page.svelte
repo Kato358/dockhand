@@ -940,7 +940,7 @@
 <div class="flex-1 min-h-0 flex flex-col gap-3 overflow-hidden">
 	<!-- Header with filters -->
 	<div class="shrink-0 flex flex-wrap justify-between items-center gap-3 min-h-8">
-		<PageHeader icon={Timer} title="Schedules" count={filteredSchedules.length} />
+		<PageHeader icon={Timer} title="计划任务" count={filteredSchedules.length} />
 		<div class="flex flex-wrap items-center gap-2">
 			<div class="relative">
 				<Search class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -1021,9 +1021,7 @@
 					<!-- BETA GATE: backup schedule filters hidden unless FEAT_BACKUPS_ENABLED (see features.ts) -->
 					{#if $page.data.backupsEnabled}
 						<Select.Item value="backup">
-							<Archive class="w-4 h-4 mr-2 inline text-blue-500 drop-shadow-[0_0_3px_rgba(59,130,246,0.4)]" />
-							Backups
-						</Select.Item>
+							<Archive class="w-4 h-4 mr-2 inline text-blue-500 drop-shadow-[0_0_3px_rgba(59,130,246,0.4)]" />备份</Select.Item>
 						<Select.Item value="repo_prune">
 							<ArchiveX class="w-4 h-4 mr-2 inline text-blue-500 drop-shadow-[0_0_3px_rgba(59,130,246,0.4)]" />
 							Repo prune
@@ -1166,7 +1164,7 @@
 				class="h-8 px-2"
 				onclick={clearFilters}
 				disabled={!hasActiveFilters}
-				title="Clear all filters"
+				title="清除所有筛选条件"
 			>
 				<X class="w-3.5 h-3.5" />
 			</Button>
@@ -1437,7 +1435,7 @@
 						{@const scheduleKey = getScheduleKey(schedule)}
 						<ConfirmPopover
 							open={confirmDeleteId === scheduleKey}
-							action="Remove"
+							action="移除"
 							itemType="schedule"
 							itemName={schedule.entityName}
 							title="Remove schedule"
@@ -1537,7 +1535,7 @@
 												<button
 													type="button"
 													onclick={() => loadExecutionDetail(exec.id)}
-													title="View logs"
+													title="查看日志"
 													class="p-0.5 rounded hover:bg-muted transition-colors opacity-70 hover:opacity-100 cursor-pointer"
 												>
 													<FileText class="grid-action-icon grid-action-logs text-muted-foreground hover:text-blue-500" />

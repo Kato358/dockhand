@@ -681,9 +681,7 @@ const severityOrder: Record<string, number> = { critical: 0, high: 1, medium: 2,
 					Updating...
 				</Button>
 			{:else}
-				<Button variant="outline" onclick={handleClose}>
-					Close
-				</Button>
+				<Button variant="outline" onclick={handleClose}>关闭</Button>
 			{/if}
 		</Dialog.Footer>
 	</Dialog.Content>

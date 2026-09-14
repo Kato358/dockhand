@@ -1674,7 +1674,7 @@
 			{#if selectedStopped.length > 0 && $canAccess('stacks', 'start')}
 				<ConfirmPopover
 					open={confirmBulkStart}
-					action="Start"
+					action="启动"
 					itemType="stacks"
 					itemName="{selectedStopped.length} stack{selectedStopped.length !== 1 ? 's' : ''}"
 					title="Start {selectedStopped.length}"
@@ -1685,16 +1685,14 @@
 				>
 					{#snippet children({ open })}
 						<span class="inline-flex items-center gap-1 px-1.5 py-0 rounded border border-border hover:text-green-600 hover:border-green-500/40 hover:shadow transition-all cursor-pointer">
-							<Play class="w-3 h-3" />
-							Start
-						</span>
+							<Play class="w-3 h-3" />启动</span>
 					{/snippet}
 				</ConfirmPopover>
 			{/if}
 			{#if selectedRunning.length > 0 && $canAccess('stacks', 'restart')}
 				<ConfirmPopover
 					open={confirmBulkRestart}
-					action="Restart"
+					action="重启"
 					itemType="stacks"
 					itemName="{selectedRunning.length} stack{selectedRunning.length !== 1 ? 's' : ''}"
 					title="Restart {selectedRunning.length}"
@@ -1705,16 +1703,14 @@
 				>
 					{#snippet children({ open })}
 						<span class="inline-flex items-center gap-1 px-1.5 py-0 rounded border border-border hover:text-amber-600 hover:border-amber-500/40 hover:shadow transition-all cursor-pointer">
-							<RotateCcw class="w-3 h-3" />
-							Restart
-						</span>
+							<RotateCcw class="w-3 h-3" />重启</span>
 					{/snippet}
 				</ConfirmPopover>
 			{/if}
 			{#if selectedRunning.length > 0 && $canAccess('stacks', 'stop')}
 				<ConfirmPopover
 					open={confirmBulkStop}
-					action="Stop"
+					action="停止"
 					itemType="stacks"
 					itemName="{selectedRunning.length} stack{selectedRunning.length !== 1 ? 's' : ''}"
 					title="Stop {selectedRunning.length}"
@@ -1724,9 +1720,7 @@
 				>
 					{#snippet children({ open })}
 						<span class="inline-flex items-center gap-1 px-1.5 py-0 rounded border border-border hover:text-red-600 hover:border-red-500/40 hover:shadow transition-all cursor-pointer">
-							<Square class="w-3 h-3" />
-							Stop
-						</span>
+							<Square class="w-3 h-3" />停止</span>
 					{/snippet}
 				</ConfirmPopover>
 			{/if}
@@ -1752,7 +1746,7 @@
 			{#if $canAccess('stacks', 'remove')}
 			<ConfirmPopover
 				open={confirmBulkRemove}
-				action="Remove"
+				action="移除"
 				itemType="stacks"
 				itemName="{selectedInFilter.length} stack{selectedInFilter.length !== 1 ? 's' : ''}"
 				title="Remove {selectedInFilter.length}"
@@ -1762,9 +1756,7 @@
 			>
 				{#snippet children({ open })}
 					<span class="inline-flex items-center gap-1 px-1.5 py-0 rounded border border-border hover:text-destructive hover:border-destructive/40 hover:shadow transition-all cursor-pointer">
-						<Trash2 class="w-3 h-3" />
-						Remove
-					</span>
+						<Trash2 class="w-3 h-3" />移除</span>
 				{/snippet}
 			</ConfirmPopover>
 			{/if}
@@ -2197,7 +2189,7 @@
 									<button
 										type="button"
 										onclick={(e) => { e.stopPropagation(); editStack(stack.name); }}
-										title="Edit"
+										title="编辑"
 										class="p-1 rounded hover:bg-muted transition-colors opacity-70 hover:opacity-100 cursor-pointer"
 									>
 										<Pencil class="grid-action-icon grid-action-edit text-muted-foreground hover:text-blue-500" />
@@ -2208,7 +2200,7 @@
 								<button
 									type="button"
 									onclick={(e) => { e.stopPropagation(); viewStackLogs(stack); }}
-									title="View logs"
+									title="查看日志"
 									class="p-1 rounded hover:bg-muted transition-colors opacity-70 hover:opacity-100 cursor-pointer"
 								>
 									<ScrollText class="grid-action-icon grid-action-logs text-muted-foreground hover:text-blue-500" />
@@ -2236,7 +2228,7 @@
 									<button
 										type="button"
 										onclick={(e) => { e.stopPropagation(); startStack(stack.name); }}
-										title="Start"
+										title="启动"
 										class="p-1 rounded hover:bg-muted transition-colors opacity-70 hover:opacity-100 cursor-pointer"
 									>
 										<Play class="grid-action-icon grid-action-start text-muted-foreground hover:text-green-500" />
@@ -2249,7 +2241,7 @@
 											{#snippet child({ props })}
 												<button
 													type="button"
-													title="Restart"
+													title="重启"
 													{...props}
 													onclick={(e) => { e.stopPropagation(); restartPopoverOpen[stack.name] = !restartPopoverOpen[stack.name]; }}
 													class="p-1 rounded hover:bg-muted transition-colors opacity-70 hover:opacity-100 cursor-pointer inline-flex items-center"
@@ -2270,7 +2262,7 @@
 													<span class="truncate">Restart stack <strong class="font-semibold text-foreground">{stack.name}</strong></span>
 												</span>
 												<button class="flex flex-col items-start gap-0.5 rounded px-2 py-1.5 text-left hover:bg-muted" onclick={() => { restartPopoverOpen[stack.name] = false; restartStack(stack.name, 'restart'); }}>
-													<span class="text-xs font-medium">Restart</span>
+													<span class="text-xs font-medium">重启</span>
 													<span class="text-[11px] text-muted-foreground">Fast in-place restart. Ignores depends_on ordering.</span>
 												</button>
 												<button class="flex flex-col items-start gap-0.5 rounded px-2 py-1.5 text-left hover:bg-muted" onclick={() => { restartPopoverOpen[stack.name] = false; restartStack(stack.name, 'ordered'); }}>
@@ -2288,10 +2280,10 @@
 								{#if $canAccess('stacks', 'stop')}
 									<ConfirmPopover
 										open={confirmStopName === stack.name}
-										action="Stop"
+										action="停止"
 										itemType="stack"
 										itemName={stack.name}
-										title="Stop"
+										title="停止"
 										onConfirm={() => stopStack(stack.name)}
 										onOpenChange={(open) => confirmStopName = open ? stack.name : null}
 									>
@@ -2326,7 +2318,7 @@
 						{#if $canAccess('stacks', 'remove')}
 							<button
 								type="button"
-								title="Remove"
+								title="移除"
 								onclick={(e) => { e.stopPropagation(); deleteStackName = stack.name; showDeleteModal = true; }}
 								class="p-0.5 rounded hover:bg-muted transition-colors cursor-pointer"
 							>
@@ -2371,7 +2363,7 @@
 														itemType="container"
 														itemName={container.name}
 														position="left"
-														title="Update available - click to update"
+														title="有可用更新，点击更新"
 														onConfirm={() => updateSingleContainer(container.id, container.name)}
 													>
 														{#snippet children({ open })}
@@ -2665,7 +2657,7 @@
 											{#if container.state === 'running' && $canAccess('containers', 'files')}
 												<button
 													type="button"
-													title="Browse files"
+													title="浏览文件"
 													onclick={(e) => { e.stopPropagation(); browseFiles(container.id, container.name); }}
 													class="p-1 rounded hover:bg-muted transition-colors opacity-70 hover:opacity-100 cursor-pointer"
 												>
@@ -2709,7 +2701,7 @@
 													{#if $canAccess('containers', 'start')}
 														<button
 															type="button"
-															title="Start"
+															title="启动"
 															onclick={(e) => startContainer(container.id, e)}
 															class="p-1 rounded hover:bg-muted transition-colors opacity-70 hover:opacity-100 cursor-pointer"
 														>
@@ -2721,10 +2713,10 @@
 													{#if $canAccess('containers', 'restart')}
 														<ConfirmPopover
 															open={confirmRestartContainerId === container.id}
-															action="Restart"
+															action="重启"
 															itemType="container"
 															itemName={container.service}
-															title="Restart"
+															title="重启"
 															onConfirm={() => restartContainer(container.id)}
 															onOpenChange={(open) => confirmRestartContainerId = open ? container.id : null}
 														>
@@ -2751,10 +2743,10 @@
 													{#if $canAccess('containers', 'stop')}
 														<ConfirmPopover
 															open={confirmStopContainerId === container.id}
-															action="Stop"
+															action="停止"
 															itemType="container"
 															itemName={container.service}
-															title="Stop"
+															title="停止"
 															onConfirm={() => stopContainer(container.id)}
 															onOpenChange={(open) => confirmStopContainerId = open ? container.id : null}
 														>
@@ -2768,10 +2760,10 @@
 											{#if $canAccess('containers', 'remove')}
 												<ConfirmPopover
 													open={confirmRemoveContainerId === container.id}
-													action="Remove"
+													action="移除"
 													itemType="container"
 													itemName={container.service}
-													title="Remove"
+													title="移除"
 													onConfirm={() => removeContainer(container.id)}
 													onOpenChange={(open) => confirmRemoveContainerId = open ? container.id : null}
 												>

@@ -242,10 +242,10 @@
 							{#if $canAccess('notifications', 'delete')}
 								<ConfirmPopover
 									open={confirmDeleteNotificationId === notif.id}
-									action="Delete"
+									action="删除"
 									itemType="channel"
 									itemName={notif.name}
-									title="Remove"
+									title="移除"
 									position="left"
 									onConfirm={() => deleteNotification(notif.id)}
 									onOpenChange={(open) => confirmDeleteNotificationId = open ? notif.id : null}

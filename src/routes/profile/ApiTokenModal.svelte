@@ -224,7 +224,7 @@
 				{/if}
 
 				<div class="flex justify-end gap-2">
-					<Button variant="outline" onclick={handleClose}>Cancel</Button>
+					<Button variant="outline" onclick={handleClose}>取消</Button>
 					<Button onclick={createToken} disabled={creating || !name.trim() || (isLocalUser && !password)}>
 						{creating ? 'Creating...' : 'Generate token'}
 					</Button>

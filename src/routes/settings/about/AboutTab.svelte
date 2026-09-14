@@ -783,35 +783,35 @@
 									<Box class="w-4 h-4 text-blue-500" />
 								</div>
 								<div class="text-lg font-bold">{systemInfo.stats.containers.total}</div>
-								<div class="text-2xs text-muted-foreground font-medium">Containers</div>
+								<div class="text-2xs text-muted-foreground font-medium">容器</div>
 							</div>
 							<div class="stat-box stat-box-cyan">
 								<div class="stat-icon-wrapper bg-cyan-500/10">
 									<Layers class="w-4 h-4 text-cyan-500" />
 								</div>
 								<div class="text-lg font-bold">{systemInfo.stats.stacks}</div>
-								<div class="text-2xs text-muted-foreground font-medium">Stacks</div>
+								<div class="text-2xs text-muted-foreground font-medium">编排</div>
 							</div>
 							<div class="stat-box stat-box-purple">
 								<div class="stat-icon-wrapper bg-purple-500/10">
 									<Images class="w-4 h-4 text-purple-500" />
 								</div>
 								<div class="text-lg font-bold">{systemInfo.stats.images}</div>
-								<div class="text-2xs text-muted-foreground font-medium">Images</div>
+								<div class="text-2xs text-muted-foreground font-medium">镜像</div>
 							</div>
 							<div class="stat-box stat-box-green">
 								<div class="stat-icon-wrapper bg-green-500/10">
 									<HardDrive class="w-4 h-4 text-green-500" />
 								</div>
 								<div class="text-lg font-bold">{systemInfo.stats.volumes}</div>
-								<div class="text-2xs text-muted-foreground font-medium">Volumes</div>
+								<div class="text-2xs text-muted-foreground font-medium">存储卷</div>
 							</div>
 							<div class="stat-box stat-box-orange">
 								<div class="stat-icon-wrapper bg-orange-500/10">
 									<Network class="w-4 h-4 text-orange-500" />
 								</div>
 								<div class="text-lg font-bold">{systemInfo.stats.networks}</div>
-								<div class="text-2xs text-muted-foreground font-medium">Networks</div>
+								<div class="text-2xs text-muted-foreground font-medium">网络</div>
 							</div>
 						</div>
 						{/if}

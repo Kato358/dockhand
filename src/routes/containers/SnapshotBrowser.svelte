@@ -180,7 +180,7 @@
 									<dt class="text-muted-foreground">Environment ID</dt>
 									<dd class="font-mono">{metadata.environmentId}</dd>
 								{/if}
-								<dt class="text-muted-foreground">Volumes</dt>
+								<dt class="text-muted-foreground">存储卷</dt>
 								<dd>{metadata.volumes?.length ?? 0}</dd>
 								{#if metadata.type === 'stack'}
 									{#if metadata.stack?.composeFileName}
@@ -379,7 +379,7 @@
 								<!-- Networks -->
 								{#if containerInspect.NetworkSettings?.Networks && Object.keys(containerInspect.NetworkSettings.Networks).length}
 									<div class="pt-1 space-y-1.5">
-										<span class="text-xs font-semibold text-muted-foreground flex items-center gap-1.5"><Network class="w-3.5 h-3.5" />Networks</span>
+										<span class="text-xs font-semibold text-muted-foreground flex items-center gap-1.5"><Network class="w-3.5 h-3.5" />网络</span>
 										<div class="flex flex-wrap gap-1">
 											{#each Object.entries(containerInspect.NetworkSettings.Networks) as [net, cfg]}
 												<Badge variant="secondary" class="text-xs"><Network class="w-3.5 h-3.5 mr-1" />{net}{(cfg as any)?.IPAddress ? ` (${(cfg as any).IPAddress})` : ''}</Badge>

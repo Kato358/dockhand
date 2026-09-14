@@ -48,7 +48,7 @@
 
 <div class="flex-1 min-h-0 flex flex-col gap-3 overflow-hidden">
 	<div class="shrink-0 flex flex-wrap justify-between items-center gap-3 min-h-8">
-		<PageHeader icon={Settings} title="Settings" showConnection={false} />
+		<PageHeader icon={Settings} title="设置" showConnection={false} />
 	</div>
 
 	<Tabs.Root value={activeTab} onValueChange={handleTabChange} class="w-full flex-1 min-h-0 flex flex-col">
@@ -88,9 +88,7 @@
 			<!-- BETA GATE: Backups tab hidden unless FEAT_BACKUPS_ENABLED (see features.ts) -->
 			{#if $page.data.backupsEnabled}
 				<Tabs.Trigger value="backups" class="flex-1 flex items-center justify-center gap-1.5">
-					<Archive class="w-4 h-4" />
-					Backups
-				</Tabs.Trigger>
+					<Archive class="w-4 h-4" />备份</Tabs.Trigger>
 			{/if}
 			<Tabs.Trigger value="auth" class="flex-1 flex items-center justify-center gap-1.5">
 				<Users class="w-4 h-4" />

@@ -1181,7 +1181,7 @@
 					<button
 						type="button"
 						onclick={saveEditingTitle}
-						title="Save"
+						title="保存"
 						class="p-0.5 rounded hover:bg-muted transition-colors"
 					>
 						<Check class="w-3 h-3 text-green-500 hover:text-green-600" />
@@ -1189,7 +1189,7 @@
 					<button
 						type="button"
 						onclick={cancelEditingTitle}
-						title="Cancel"
+						title="取消"
 						class="p-0.5 rounded hover:bg-muted transition-colors"
 					>
 						<X class="w-3 h-3 text-muted-foreground hover:text-foreground" />
@@ -1224,9 +1224,7 @@
 					class="flex items-center gap-1.5 px-3 py-2 text-sm transition-colors border-b-2 -mb-px {activeTab === 'settings' ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'}"
 					onclick={() => activeTab = 'settings'}
 				>
-					<Settings class="w-3.5 h-3.5" />
-					Settings
-				</button>
+					<Settings class="w-3.5 h-3.5" />设置</button>
 				<!-- BETA GATE: Backups tab hidden unless FEAT_BACKUPS_ENABLED (see features.ts) -->
 				{#if $page.data.backupsEnabled}
 					<button
@@ -1339,9 +1337,7 @@
 			</div>
 
 			<div class="flex justify-end gap-2 px-5 py-3 border-t bg-muted/30 shrink-0">
-				<Button type="button" variant="outline" onclick={handleClose} size="sm">
-					Cancel
-				</Button>
+				<Button type="button" variant="outline" onclick={handleClose} size="sm">取消</Button>
 				<Button type="button" variant="secondary" disabled={loading} size="sm" onclick={handleSubmit}>
 					{#if loading}
 						<Loader2 class="w-4 h-4 mr-1 animate-spin" />

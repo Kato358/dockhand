@@ -19,20 +19,20 @@
 	// reach. `needsEnv` = the page is env-scoped (shown with the chosen env in the hint and
 	// eligible for env-click). `permission` / `gate` / `enterpriseOnly` mirror canSeeMenuItem.
 	const ALL_PAGES = [
-		{ value: 'dashboard', label: 'Dashboard', Icon: LayoutDashboard, needsEnv: false, permission: 'always' },
-		{ value: 'containers', label: 'Containers', Icon: Box, needsEnv: true, permission: 'containers' },
-		{ value: 'logs', label: 'Logs', Icon: ScrollText, needsEnv: true, permission: 'containers' },
-		{ value: 'terminal', label: 'Shell', Icon: Terminal, needsEnv: true, permission: 'containers' },
+		{ value: 'dashboard', label: '仪表盘', Icon: LayoutDashboard, needsEnv: false, permission: 'always' },
+		{ value: 'containers', label: '容器', Icon: Box, needsEnv: true, permission: 'containers' },
+		{ value: 'logs', label: '日志', Icon: ScrollText, needsEnv: true, permission: 'containers' },
+		{ value: 'terminal', label: '终端', Icon: Terminal, needsEnv: true, permission: 'containers' },
 		{ value: 'stacks', label: 'Compose stacks', Icon: Layers, needsEnv: true, permission: 'stacks' },
-		{ value: 'images', label: 'Images', Icon: Images, needsEnv: true, permission: 'images' },
-		{ value: 'volumes', label: 'Volumes', Icon: HardDrive, needsEnv: true, permission: 'volumes' },
-		{ value: 'networks', label: 'Networks', Icon: Network, needsEnv: true, permission: 'networks' },
-		{ value: 'templates', label: 'Templates', Icon: LibraryBig, needsEnv: false, permission: 'templates' },
-		{ value: 'registry', label: 'Registry', Icon: Download, needsEnv: false, permission: 'registries' },
-		{ value: 'activity', label: 'Activity', Icon: Activity, needsEnv: false, permission: 'activity' },
-		{ value: 'backups', label: 'Backups', Icon: Archive, needsEnv: false, permission: 'backups', gate: 'backups' },
-		{ value: 'schedules', label: 'Schedules', Icon: Timer, needsEnv: false, permission: 'schedules' },
-		{ value: 'audit', label: 'Audit log', Icon: ClipboardList, needsEnv: false, permission: 'audit_logs', enterpriseOnly: true }
+		{ value: 'images', label: '镜像', Icon: Images, needsEnv: true, permission: 'images' },
+		{ value: 'volumes', label: '存储卷', Icon: HardDrive, needsEnv: true, permission: 'volumes' },
+		{ value: 'networks', label: '网络', Icon: Network, needsEnv: true, permission: 'networks' },
+		{ value: 'templates', label: '模板', Icon: LibraryBig, needsEnv: false, permission: 'templates' },
+		{ value: 'registry', label: '镜像仓库', Icon: Download, needsEnv: false, permission: 'registries' },
+		{ value: 'activity', label: '活动', Icon: Activity, needsEnv: false, permission: 'activity' },
+		{ value: 'backups', label: '备份', Icon: Archive, needsEnv: false, permission: 'backups', gate: 'backups' },
+		{ value: 'schedules', label: '计划任务', Icon: Timer, needsEnv: false, permission: 'schedules' },
+		{ value: 'audit', label: '审计日志', Icon: ClipboardList, needsEnv: false, permission: 'audit_logs', enterpriseOnly: true }
 	] as const;
 
 	// Visibility mirrors app-sidebar's canSeeMenuItem: hide the Backups beta unless the gate is
@@ -74,7 +74,7 @@
 	const clickSel = $derived(resolve(envClickPageV, 'containers'));
 
 	// Label helper for the trigger + the (default: X) hint.
-	const pageLabel = (v: string | null): string => v ? pageOf(v).label : 'Dashboard';
+	const pageLabel = (v: string | null): string => v ? pageOf(v).label : '仪表盘';
 
 	onMount(async () => {
 		try {

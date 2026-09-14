@@ -307,9 +307,7 @@
 						<p class="text-xs text-muted-foreground/70 mt-1">
 							Containers built from scratch or distroless images often don't include shells.
 						</p>
-						<Button onclick={handleClose} variant="outline" class="mt-6">
-							Close
-						</Button>
+						<Button onclick={handleClose} variant="outline" class="mt-6">关闭</Button>
 					</div>
 				{:else}
 					<div class="w-full max-w-md space-y-6">
@@ -323,7 +321,7 @@
 
 						<div class="space-y-4">
 							<div class="space-y-2">
-								<Label>Shell</Label>
+								<Label>终端</Label>
 								<Select.Root type="single" bind:value={selectedShell}>
 									<Select.Trigger class="w-full h-10">
 										<Shell class="w-4 h-4 mr-2 text-muted-foreground" />

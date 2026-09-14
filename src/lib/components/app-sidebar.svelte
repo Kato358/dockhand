@@ -123,21 +123,21 @@
 	}
 
 	const menuItems: readonly MenuItem[] = [
-		{ href: '/?home', Icon: LayoutDashboard, label: 'Dashboard', permission: 'always' },
-		{ href: '/containers', Icon: Box, label: 'Containers', permission: 'containers' },
-		{ href: '/logs', Icon: ScrollText, label: 'Logs', permission: 'containers' },
-		{ href: '/terminal', Icon: Terminal, label: 'Shell', permission: 'containers' },
-		{ href: '/stacks', Icon: Layers, label: 'Stacks', permission: 'stacks' },
-		{ href: '/images', Icon: Images, label: 'Images', permission: 'images' },
-		{ href: '/volumes', Icon: HardDrive, label: 'Volumes', permission: 'volumes' },
-		{ href: '/networks', Icon: Network, label: 'Networks', permission: 'networks' },
-		{ href: '/templates', Icon: LibraryBig, label: 'Templates', permission: 'templates' },
-		{ href: '/registry', Icon: Download, label: 'Registry', permission: 'registries' },
-		{ href: '/activity', Icon: Activity, label: 'Activity', permission: 'activity' },
-		{ href: '/backups', Icon: Archive, label: 'Backups', permission: 'backups' },
-		{ href: '/schedules', Icon: Timer, label: 'Schedules', permission: 'schedules' },
-		{ href: '/audit', Icon: ClipboardList, label: 'Audit log', permission: 'audit_logs', enterpriseOnly: true },
-		{ href: '/settings', Icon: Settings, label: 'Settings', permission: 'settings' }
+		{ href: '/?home', Icon: LayoutDashboard, label: '仪表盘', permission: 'always' },
+		{ href: '/containers', Icon: Box, label: '容器', permission: 'containers' },
+		{ href: '/logs', Icon: ScrollText, label: '日志', permission: 'containers' },
+		{ href: '/terminal', Icon: Terminal, label: '终端', permission: 'containers' },
+		{ href: '/stacks', Icon: Layers, label: '编排', permission: 'stacks' },
+		{ href: '/images', Icon: Images, label: '镜像', permission: 'images' },
+		{ href: '/volumes', Icon: HardDrive, label: '存储卷', permission: 'volumes' },
+		{ href: '/networks', Icon: Network, label: '网络', permission: 'networks' },
+		{ href: '/templates', Icon: LibraryBig, label: '模板', permission: 'templates' },
+		{ href: '/registry', Icon: Download, label: '镜像仓库', permission: 'registries' },
+		{ href: '/activity', Icon: Activity, label: '活动', permission: 'activity' },
+		{ href: '/backups', Icon: Archive, label: '备份', permission: 'backups' },
+		{ href: '/schedules', Icon: Timer, label: '计划任务', permission: 'schedules' },
+		{ href: '/audit', Icon: ClipboardList, label: '审计日志', permission: 'audit_logs', enterpriseOnly: true },
+		{ href: '/settings', Icon: Settings, label: '设置', permission: 'settings' }
 	] as const;
 
 	// --- Sidebar customization (#1252): reorder + hide/show menu items ---
@@ -455,10 +455,10 @@
 						type="button"
 						onclick={handleLogout}
 						class="flex items-center gap-2 w-full px-2 py-1.5 group-data-[state=collapsed]:px-1 group-data-[state=collapsed]:py-1 text-sm text-muted-foreground hover:text-foreground hover:bg-sidebar-accent rounded-md transition-colors group-data-[state=collapsed]:justify-center"
-						title="Sign out"
+						title="退出登录"
 					>
 						<LogOut class="w-4 h-4 shrink-0 group-data-[state=collapsed]:w-3.5 group-data-[state=collapsed]:h-3.5" />
-						<span class="group-data-[state=collapsed]:hidden">Sign out</span>
+						<span class="group-data-[state=collapsed]:hidden">退出登录</span>
 					</button>
 				</Sidebar.MenuItem>
 			</Sidebar.Menu>

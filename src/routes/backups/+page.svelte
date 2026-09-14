@@ -746,7 +746,7 @@
 
 <div class="flex-1 min-h-0 flex flex-col gap-3 overflow-hidden">
 	<div class="shrink-0 flex flex-wrap justify-between items-center gap-3 min-h-8">
-		<PageHeader title="Backups" icon={Archive} count={filteredConfigs.length}>
+		<PageHeader title="备份" icon={Archive} count={filteredConfigs.length}>
 			{#if loading}
 				<span class="flex items-center gap-1.5 text-xs text-muted-foreground">
 					<Loader2 class="w-3.5 h-3.5 animate-spin" />
@@ -769,8 +769,8 @@
 				</Select.Trigger>
 				<Select.Content>
 					<Select.Item value="all">All types</Select.Item>
-					<Select.Item value="container"><Box class="w-3 h-3 mr-1.5 inline text-muted-foreground" />Containers</Select.Item>
-					<Select.Item value="stack"><Layers class="w-3 h-3 mr-1.5 inline text-muted-foreground" />Stacks</Select.Item>
+					<Select.Item value="container"><Box class="w-3 h-3 mr-1.5 inline text-muted-foreground" />容器</Select.Item>
+					<Select.Item value="stack"><Layers class="w-3 h-3 mr-1.5 inline text-muted-foreground" />编排</Select.Item>
 				</Select.Content>
 			</Select.Root>
 			<Select.Root type="single" value={filterEnvId} onValueChange={(v) => { filterEnvId = v === 'all' ? '' : v; }}>
@@ -989,7 +989,7 @@
 							</button>
 							<ConfirmPopover
 								open={confirmDeleteConfig === config.id}
-								action="Delete"
+								action="删除"
 								itemType="backup config"
 								itemName={config.targetName}
 								title={deleteConfigSnapshots ? 'Snapshots will be deleted too.' : 'Existing snapshots are kept.'}
@@ -1073,7 +1073,7 @@
 										<th class="text-left py-1.5 w-40" style="padding-left:8px">Created</th>
 										<th class="text-left py-1.5 w-64" style="padding-left:8px">Stats</th>
 										<th class="text-left py-1.5 w-32" style="padding-left:8px">Repo</th>
-										<th class="text-right px-3 py-1.5 w-28">Actions</th>
+										<th class="text-right px-3 py-1.5 w-28">操作</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -1108,7 +1108,7 @@
 															<ArrowLeftRight class="w-3 h-3 {isDiffPending ? 'text-primary' : 'text-muted-foreground'}" />
 														</button>
 													{/if}
-													<button type="button" class="p-1 rounded hover:bg-muted transition-colors" onclick={() => openBrowser(config, snapshot)} title="Browse files">
+													<button type="button" class="p-1 rounded hover:bg-muted transition-colors" onclick={() => openBrowser(config, snapshot)} title="浏览文件">
 														<FolderOpen class="w-3 h-3 text-muted-foreground" />
 													</button>
 													<button type="button" class="p-1 rounded hover:bg-muted transition-colors" onclick={() => openRestore(config, snapshot)} title="Restore">
@@ -1116,7 +1116,7 @@
 													</button>
 													<ConfirmPopover
 														open={confirmDeleteSnapshot === snapshot.id}
-														action="Delete"
+														action="删除"
 														itemType="snapshot"
 														itemName={snapshot.shortId}
 														title="Delete snapshot"

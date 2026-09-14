@@ -60,13 +60,13 @@
 
 <div class="flex-1 flex flex-col min-h-0">
 	<div class="flex items-center justify-between text-xs text-muted-foreground mb-1 shrink-0">
-		<span>Logs</span>
+		<span>日志</span>
 		{#if onToggleTheme}
 			<button
 				type="button"
 				onclick={onToggleTheme}
 				class="p-1 rounded hover:bg-muted transition-colors"
-				title="Toggle log theme"
+				title="切换日志主题"
 			>
 				{#if darkMode}
 					<Sun class="w-3.5 h-3.5" />

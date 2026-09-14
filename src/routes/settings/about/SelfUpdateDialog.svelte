@@ -587,9 +587,7 @@
 			</div>
 
 			<Dialog.Footer>
-				<Button variant="outline" onclick={handleClose}>
-					Cancel
-				</Button>
+				<Button variant="outline" onclick={handleClose}>取消</Button>
 				<Button onclick={startUpdate}>
 					<CircleArrowUp class="w-4 h-4 mr-2" />
 					Update now
@@ -657,9 +655,7 @@
 						Reload
 					</Button>
 				{:else if phase === 'error'}
-					<Button variant="outline" onclick={handleClose}>
-						Close
-					</Button>
+					<Button variant="outline" onclick={handleClose}>关闭</Button>
 				{:else}
 					<Button variant="outline" disabled>
 						<Loader2 class="w-4 h-4 mr-2 animate-spin" />

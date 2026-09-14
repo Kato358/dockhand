@@ -1257,9 +1257,7 @@ services:
 			<Card.Root>
 				<Card.Header>
 					<Card.Title class="text-sm font-medium flex items-center gap-2">
-						<LayoutDashboard class="w-4 h-4" />
-						Dashboard
-					</Card.Title>
+						<LayoutDashboard class="w-4 h-4" />仪表盘</Card.Title>
 				</Card.Header>
 				<Card.Content class="space-y-4">
 					<div class="space-y-3">

@@ -598,7 +598,7 @@
 				{/if}
 			</div>
 			<div class="flex items-center gap-2">
-				<Button variant="outline" onclick={() => { open = false; onclose(); }}>Close</Button>
+				<Button variant="outline" onclick={() => { open = false; onclose(); }}>关闭</Button>
 				{#if result && result.discovered.length > 0}
 					<Button
 						onclick={handleAdopt}

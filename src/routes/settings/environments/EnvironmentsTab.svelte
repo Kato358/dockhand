@@ -426,7 +426,7 @@
 						<Table.Head class="w-[120px]">Status</Table.Head>
 						<Table.Head class="w-[100px]">Docker</Table.Head>
 						<Table.Head class="w-[100px]">Hawser</Table.Head>
-						<Table.Head class="w-[180px] text-right">Actions</Table.Head>
+						<Table.Head class="w-[180px] text-right">操作</Table.Head>
 					</Table.Row>
 				</Table.Header>
 				<Table.Body>
@@ -440,11 +440,11 @@
 								<div class="flex items-center gap-2">
 									<EnvironmentIcon icon={env.icon || 'globe'} envId={env.id} class="w-4 h-4 text-muted-foreground shrink-0" />
 									{#if env.connectionType === 'socket' || !env.connectionType}
-										<span title="Unix socket connection" class="shrink-0">
+										<span title="Unix 套接字连接" class="shrink-0">
 											<Unplug class="w-3.5 h-3.5 text-cyan-500 glow-cyan" />
 										</span>
 									{:else if env.connectionType === 'direct'}
-										<span title="Direct Docker connection" class="shrink-0">
+										<span title="直连 Docker" class="shrink-0">
 											<Icon iconNode={whale} class="w-3.5 h-3.5 text-blue-500 glow-blue" />
 										</span>
 									{:else if env.connectionType === 'hawser-standard'}
@@ -517,17 +517,17 @@
 										</span>
 									{/if}
 									{#if hasScannerEnabled}
-										<span title="Vulnerability scanning enabled">
+										<span title="已启用漏洞扫描">
 											<ShieldCheck class="w-4 h-4 text-green-500 glow-green" />
 										</span>
 									{/if}
 									{#if env.collectActivity}
-										<span title="Activity collection enabled">
+										<span title="已启用活动采集">
 											<Activity class="w-4 h-4 text-amber-500 glow-amber" />
 										</span>
 									{/if}
 									{#if env.collectMetrics}
-										<span title="Metrics collection enabled">
+										<span title="已启用指标采集">
 											<Cpu class="w-4 h-4 text-sky-400 glow-sky" />
 										</span>
 									{/if}
@@ -608,7 +608,7 @@
 										class="h-7 px-2"
 										onclick={() => testConnection(env.id)}
 										disabled={isTesting}
-										title="Test connection"
+										title="测试连接"
 									>
 										{#if isTesting}
 											<RefreshCw class="w-3.5 h-3.5 animate-spin" />
@@ -753,9 +753,7 @@
 			</Dialog.Description>
 		</Dialog.Header>
 		<div class="flex justify-end gap-2 mt-4">
-			<Button variant="outline" onclick={cancelDelete}>
-				Cancel
-			</Button>
+			<Button variant="outline" onclick={cancelDelete}>取消</Button>
 			<Button variant="destructive" onclick={confirmAndDelete}>
 				<Trash2 class="w-4 h-4 mr-2" />
 				Delete environment

@@ -164,16 +164,16 @@
 	let showExportMenu = $state(false);
 
 	const entityTypes = [
-		{ value: 'container', label: 'Containers' },
-		{ value: 'image', label: 'Images' },
-		{ value: 'volume', label: 'Volumes' },
-		{ value: 'network', label: 'Networks' },
-		{ value: 'stack', label: 'Stacks' },
+		{ value: 'container', label: '容器' },
+		{ value: 'image', label: '镜像' },
+		{ value: 'volume', label: '存储卷' },
+		{ value: 'network', label: '网络' },
+		{ value: 'stack', label: '编排' },
 		{ value: 'environment', label: 'Environments' },
 		{ value: 'registry', label: 'Registries' },
 		{ value: 'user', label: 'Users' },
 		{ value: 'role', label: 'Roles' },
-		{ value: 'settings', label: 'Settings' },
+		{ value: 'settings', label: '设置' },
 		{ value: 'git_repository', label: 'Git repositories' },
 		{ value: 'git_credential', label: 'Git credentials' }
 	];
@@ -181,10 +181,10 @@
 	const actionTypes = [
 		{ value: 'create', label: 'Create' },
 		{ value: 'update', label: 'Update' },
-		{ value: 'delete', label: 'Delete' },
-		{ value: 'start', label: 'Start' },
-		{ value: 'stop', label: 'Stop' },
-		{ value: 'restart', label: 'Restart' },
+		{ value: 'delete', label: '删除' },
+		{ value: 'start', label: '启动' },
+		{ value: 'stop', label: '停止' },
+		{ value: 'restart', label: '重启' },
 		{ value: 'pause', label: 'Pause' },
 		{ value: 'unpause', label: 'Unpause' },
 		{ value: 'pull', label: 'Pull' },
@@ -603,7 +603,7 @@
 	<!-- Header -->
 	<div class="shrink-0 flex flex-wrap justify-between items-center gap-3 min-h-8">
 		<div class="flex items-center gap-3">
-			<PageHeader icon={Crown} title="Audit log" iconClass="text-amber-500" count={visibleEnd > 0 ? `${visibleStart}-${visibleEnd}` : undefined} total={total > 0 ? total : undefined} countClass="min-w-32" />
+			<PageHeader icon={Crown} title="审计日志" iconClass="text-amber-500" count={visibleEnd > 0 ? `${visibleStart}-${visibleEnd}` : undefined} total={total > 0 ? total : undefined} countClass="min-w-32" />
 		</div>
 		{#if $licenseStore.isEnterprise}
 			<div class="flex flex-wrap items-center gap-2">
@@ -788,7 +788,7 @@
 					class="h-8 px-2"
 					onclick={clearFilters}
 					disabled={!hasActiveFilters}
-					title="Clear all filters"
+					title="清除所有筛选条件"
 				>
 					<X class="w-3.5 h-3.5" />
 				</Button>
@@ -796,7 +796,7 @@
 				<!-- Live indicator -->
 				<span
 					class="flex items-center gap-1.5 text-xs {$auditSseConnected ? 'text-emerald-500' : 'text-muted-foreground'}"
-					title={$auditSseConnected ? 'Live updates active' : 'Connecting...'}
+					title={$auditSseConnected ? 'Live updates active' : '连接中…'}
 				>
 					<Wifi class="w-3.5 h-3.5" />
 				</span>
@@ -1040,7 +1040,7 @@
 			</div>
 		{/if}
 		<Dialog.Footer>
-			<Button variant="outline" onclick={() => showDetailDialog = false}>Close</Button>
+			<Button variant="outline" onclick={() => showDetailDialog = false}>关闭</Button>
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>

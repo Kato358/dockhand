@@ -394,7 +394,7 @@
 		<Dialog.Header>
 			<Dialog.Title class="flex items-center gap-2">
 				<KeyRound class="w-5 h-5 text-muted-foreground" />
-				{isEditing ? "Edit" : "Add"} secret provider
+				{isEditing ? "编辑" : "Add"} secret provider
 			</Dialog.Title>
 		</Dialog.Header>
 		<div class="space-y-4">
@@ -519,11 +519,9 @@
 					{:else}
 						<PlugZap class="w-4 h-4" />
 					{/if}
-				</span>
-				Test connection
-			</Button>
+				</span>测试连接</Button>
 			<div class="flex-1"></div>
-			<Button variant="outline" onclick={handleClose}>Cancel</Button>
+			<Button variant="outline" onclick={handleClose}>取消</Button>
 			<Button onclick={save} disabled={formSaving}>
 				{#if formSaving}
 					<RefreshCw class="w-4 h-4 mr-1 animate-spin" />
@@ -532,7 +530,7 @@
 				{:else}
 					<Plus class="w-4 h-4" />
 				{/if}
-				{isEditing ? "Save" : "Add"}
+				{isEditing ? "保存" : "Add"}
 			</Button>
 		</Dialog.Footer>
 	</Dialog.Content>

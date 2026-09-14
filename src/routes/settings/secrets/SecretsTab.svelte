@@ -209,10 +209,10 @@
 								{#if $canAccess("secrets", "delete")}
 									<ConfirmPopover
 										open={confirmDeleteId === provider.id}
-										action="Delete"
+										action="删除"
 										itemType="secret provider"
 										itemName={provider.name}
-										title="Remove"
+										title="移除"
 										position="left"
 										autoHideMs={0}
 										onConfirm={() =>

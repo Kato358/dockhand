@@ -179,9 +179,7 @@
 		{/if}
 
 		<div class="mt-4 flex justify-end gap-1.5">
-			<Button variant="outline" size="sm" onclick={() => (open = false)} disabled={busy}>
-				Cancel
-			</Button>
+			<Button variant="outline" size="sm" onclick={() => (open = false)} disabled={busy}>取消</Button>
 			<Button variant="destructive" size="sm" onclick={run} disabled={busy || loading}>
 				{#if busy}<Loader2 class="w-3.5 h-3.5 mr-1 animate-spin" />{:else}<Trash2 class="w-3.5 h-3.5 mr-1" />{/if}
 				Remove

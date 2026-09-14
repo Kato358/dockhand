@@ -157,7 +157,7 @@
 		<Dialog.Header>
 			<Dialog.Title class="flex items-center gap-2">
 				<Key class="w-5 h-5" />
-				{isEditing ? 'Edit' : 'Add'} Git credential
+				{isEditing ? '编辑' : 'Add'} Git credential
 			</Dialog.Title>
 			<Dialog.Description>
 				{isEditing ? 'Update credential settings' : 'Create a new credential for accessing Git repositories'}
@@ -241,7 +241,7 @@
 			{/if}
 
 			<Dialog.Footer>
-				<Button variant="outline" type="button" onclick={onClose}>Cancel</Button>
+				<Button variant="outline" type="button" onclick={onClose}>取消</Button>
 				<Button type="submit" disabled={formSaving}>
 					{formSaving ? 'Saving...' : (isEditing ? 'Save changes' : 'Add credential')}
 				</Button>

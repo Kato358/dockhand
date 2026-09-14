@@ -495,7 +495,7 @@
 		</Tabs.Root>
 
 		<Dialog.Footer class="flex-shrink-0 border-t pt-4">
-			<Button variant="outline" onclick={handleClose}>Cancel</Button>
+			<Button variant="outline" onclick={handleClose}>取消</Button>
 			<Button onclick={save} disabled={formSaving}>
 				{#if formSaving}
 					<RefreshCw class="w-4 h-4 mr-1 animate-spin" />
@@ -504,7 +504,7 @@
 				{:else}
 					<Plus class="w-4 h-4" />
 				{/if}
-				{isEditing ? 'Save' : 'Add provider'}
+				{isEditing ? '保存' : 'Add provider'}
 			</Button>
 		</Dialog.Footer>
 	</Dialog.Content>

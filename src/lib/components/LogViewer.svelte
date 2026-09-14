@@ -289,7 +289,7 @@
 			<button
 				onclick={() => onAutoScrollChange?.(!autoScroll)}
 				class="flex items-center gap-1 px-1.5 py-0.5 rounded text-xs transition-colors {autoScroll ? (dark ? 'bg-amber-500/20 ring-1 ring-amber-500/50 text-amber-400' : 'bg-amber-500/30 ring-1 ring-amber-600/50 text-amber-700') : dark ? 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-300'}"
-				title="Toggle auto-scroll"
+				title="切换自动滚动"
 			>
 				<ArrowDownToLine class="w-3 h-3" />
 			</button>
@@ -315,7 +315,7 @@
 			<button
 				onclick={() => wordWrap = !wordWrap}
 				class="p-1 rounded transition-colors {wordWrap ? (dark ? 'bg-amber-500/20 ring-1 ring-amber-500/50' : 'bg-amber-500/30 ring-1 ring-amber-600/50') : ''} {dark ? 'hover:bg-zinc-800' : 'hover:bg-gray-300'}"
-				title="Toggle word wrap"
+				title="切换自动换行"
 			>
 				<WrapText class="w-3 h-3 transition-colors {wordWrap ? (dark ? 'text-amber-400' : 'text-amber-700') : dark ? 'text-zinc-500 hover:text-zinc-300' : 'text-gray-500 hover:text-gray-700'}" />
 			</button>
@@ -334,7 +334,7 @@
 					<input
 						bind:this={logSearchInputRef}
 						type="text"
-						placeholder="Search..."
+						placeholder="搜索…"
 						bind:value={logSearchQuery}
 						onkeydown={handleLogSearchKeydown}
 						class="bg-transparent border-none outline-none text-xs w-20 {dark ? 'text-zinc-200 placeholder:text-zinc-500' : 'text-gray-800 placeholder:text-gray-400'}"
@@ -357,7 +357,7 @@
 					<button onclick={() => navigateMatch('next')} class="p-0.5 rounded {dark ? 'hover:bg-zinc-700' : 'hover:bg-gray-300'}" title="Next">
 						<ChevronDown class="w-3 h-3 {dark ? 'text-zinc-400' : 'text-gray-500'}" />
 					</button>
-					<button onclick={closeLogSearch} class="p-0.5 rounded {dark ? 'hover:bg-zinc-700' : 'hover:bg-gray-300'}" title="Close">
+					<button onclick={closeLogSearch} class="p-0.5 rounded {dark ? 'hover:bg-zinc-700' : 'hover:bg-gray-300'}" title="关闭">
 						<X class="w-3 h-3 {dark ? 'text-zinc-400' : 'text-gray-500'}" />
 					</button>
 				</div>
@@ -365,7 +365,7 @@
 				<button
 					onclick={toggleLogSearch}
 					class="p-1 rounded transition-colors {dark ? 'hover:bg-zinc-800' : 'hover:bg-gray-300'}"
-					title="Search logs"
+					title="搜索日志"
 				>
 					<Search class="w-3 h-3 {dark ? 'text-zinc-500 hover:text-zinc-300' : 'text-gray-500 hover:text-gray-700'}" />
 				</button>
@@ -374,7 +374,7 @@
 			<button
 				onclick={copyLogs}
 				class="p-1 rounded transition-colors {dark ? 'hover:bg-zinc-800' : 'hover:bg-gray-300'}"
-				title={copied ? 'Copied!' : 'Copy logs'}
+				title={copied ? 'Copied!' : '复制日志'}
 			>
 				{#if copied}
 					<Check class="w-3 h-3 text-emerald-500" />
@@ -386,7 +386,7 @@
 			<button
 				onclick={downloadLogs}
 				class="p-1 rounded transition-colors {dark ? 'hover:bg-zinc-800' : 'hover:bg-gray-300'}"
-				title="Download logs"
+				title="下载日志"
 			>
 				<Download class="w-3 h-3 {dark ? 'text-zinc-500 hover:text-zinc-300' : 'text-gray-500 hover:text-gray-700'}" />
 			</button>
@@ -395,7 +395,7 @@
 				<button
 					onclick={() => onClear?.()}
 					class="p-1 rounded transition-colors {dark ? 'hover:bg-zinc-800' : 'hover:bg-gray-300'}"
-					title="Clear logs"
+					title="清空日志"
 				>
 					<Eraser class="w-3 h-3 {dark ? 'text-zinc-500 hover:text-zinc-300' : 'text-gray-500 hover:text-gray-700'}" />
 				</button>
@@ -405,7 +405,7 @@
 				<button
 					onclick={() => onRefresh?.()}
 					class="p-1 rounded transition-colors {dark ? 'hover:bg-zinc-800' : 'hover:bg-gray-300'}"
-					title="Refresh logs"
+					title="刷新日志"
 				>
 					<RefreshCw class="w-3 h-3 {dark ? 'text-zinc-500 hover:text-zinc-300' : 'text-gray-500 hover:text-gray-700'}" />
 				</button>

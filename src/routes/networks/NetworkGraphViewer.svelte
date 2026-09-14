@@ -710,7 +710,7 @@
 											selectedNode = null;
 											selectedEdge = null;
 										}}
-										title="Close"
+										title="关闭"
 									>
 										<X class="w-3.5 h-3.5" />
 									</Button>
@@ -740,7 +740,7 @@
 											selectedNode = null;
 											selectedEdge = null;
 										}}
-										title="Close"
+										title="关闭"
 									>
 										<X class="w-3.5 h-3.5" />
 									</Button>

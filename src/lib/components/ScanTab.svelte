@@ -326,7 +326,7 @@
 						<Terminal class="w-3.5 h-3.5" />
 						<span>Output ({outputLines.length} lines)</span>
 					</div>
-					<button type="button" onclick={toggleLogTheme} class="p-1 rounded hover:bg-muted transition-colors cursor-pointer" title="Toggle log theme">
+					<button type="button" onclick={toggleLogTheme} class="p-1 rounded hover:bg-muted transition-colors cursor-pointer" title="切换日志主题">
 						{#if logDarkMode}
 							<Sun class="w-3.5 h-3.5" />
 						{:else}

@@ -280,7 +280,7 @@
 										</Button>
 										<ConfirmPopover
 											open={confirmDeleteLdapId === config.id}
-											action="Delete"
+											action="删除"
 											itemType="LDAP config"
 											itemName={config.name}
 											onConfirm={() => deleteLdapConfig(config.id)}

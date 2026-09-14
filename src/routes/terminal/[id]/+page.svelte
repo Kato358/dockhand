@@ -211,7 +211,7 @@
 			{:else if error}
 				<span class="text-xs text-red-500">{error}</span>
 			{:else}
-				<span class="text-xs text-zinc-500">Connecting...</span>
+				<span class="text-xs text-zinc-500">连接中…</span>
 			{/if}
 		</div>
 		<div class="flex items-center gap-2 text-xs text-zinc-500">

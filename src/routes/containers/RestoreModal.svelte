@@ -1041,7 +1041,7 @@
 			{#if restoreStatus === 'success' || restoreStatus === 'warning' || restoreStatus === 'error'}
 				<Button variant="outline" onclick={() => (open = false)}>OK</Button>
 			{:else if restoreStatus !== 'running'}
-				<Button variant="outline" onclick={() => (open = false)} disabled={restoring}>Cancel</Button>
+				<Button variant="outline" onclick={() => (open = false)} disabled={restoring}>取消</Button>
 				<!-- Hide the restore action until the snapshot is read — until then we
 				     don't know its volumes/target, so there's nothing to restore yet. -->
 				{#if !loading}

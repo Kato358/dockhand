@@ -23,7 +23,7 @@
 						fill="currentColor"
 					/>
 				</svg>
-				<span>Dashboard</span>
+				<span>仪表盘</span>
 			</a>
 		</li>
 		<li>
@@ -41,7 +41,7 @@
 					<rect x="13" y="3" width="7" height="7" rx="1" fill="currentColor" />
 					<rect x="13" y="13" width="7" height="7" rx="1" fill="currentColor" />
 				</svg>
-				<span>Containers</span>
+				<span>容器</span>
 			</a>
 		</li>
 		<li>
@@ -83,7 +83,7 @@
 						stroke-linecap="round"
 					/>
 				</svg>
-				<span>Images</span>
+				<span>镜像</span>
 			</a>
 		</li>
 		<li>
@@ -99,7 +99,7 @@
 					<rect x="3" y="12" width="14" height="2" rx="1" fill="currentColor" opacity="0.5" />
 					<rect x="3" y="16" width="16" height="2" rx="1" fill="currentColor" />
 				</svg>
-				<span>Logs</span>
+				<span>日志</span>
 			</a>
 		</li>
 	</ul>

@@ -1428,7 +1428,7 @@
 
 <div class="flex-1 min-h-0 flex flex-col gap-3 overflow-hidden">
 	<div class="shrink-0 flex flex-wrap justify-between items-center gap-3 min-h-8">
-		<PageHeader icon={Box} title="Containers" count={containers.length} />
+		<PageHeader icon={Box} title="容器" count={containers.length} />
 		<div class="flex flex-wrap items-center gap-2">
 			<div class="relative">
 				<Search class="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
@@ -1556,7 +1556,7 @@
 			{#if selectedStopped.length > 0 && $canAccess('containers', 'start')}
 				<ConfirmPopover
 					open={confirmBulkStart}
-					action="Start"
+					action="启动"
 					itemType="{selectedStopped.length} stopped container{selectedStopped.length !== 1 ? 's' : ''}"
 					title="Start {selectedStopped.length}"
 					variant="secondary"
@@ -1566,16 +1566,14 @@
 				>
 					{#snippet children({ open })}
 						<span class="inline-flex items-center gap-1 px-1.5 py-0 rounded border border-border hover:text-green-600 hover:border-green-500/40 hover:shadow transition-all cursor-pointer {bulkActionInProgress ? 'opacity-50' : ''}">
-							<Play class="w-3 h-3" />
-							Start
-						</span>
+							<Play class="w-3 h-3" />启动</span>
 					{/snippet}
 				</ConfirmPopover>
 			{/if}
 			{#if selectedRunning.length > 0 && $canAccess('containers', 'stop')}
 				<ConfirmPopover
 					open={confirmBulkStop}
-					action="Stop"
+					action="停止"
 					itemType="{selectedRunning.length} running container{selectedRunning.length !== 1 ? 's' : ''}"
 					title="Stop {selectedRunning.length}"
 					unstyled
@@ -1584,9 +1582,7 @@
 				>
 					{#snippet children({ open })}
 						<span class="inline-flex items-center gap-1 px-1.5 py-0 rounded border border-border hover:text-red-600 hover:border-red-500/40 hover:shadow transition-all cursor-pointer {bulkActionInProgress ? 'opacity-50' : ''}">
-							<Square class="w-3 h-3" />
-							Stop
-						</span>
+							<Square class="w-3 h-3" />停止</span>
 					{/snippet}
 				</ConfirmPopover>
 				<ConfirmPopover
@@ -1629,7 +1625,7 @@
 			{#if selectedNonSystem.length > 0 && $canAccess('containers', 'restart')}
 			<ConfirmPopover
 				open={confirmBulkRestart}
-				action="Restart"
+				action="重启"
 				itemType="{selectedNonSystem.length} container{selectedNonSystem.length !== 1 ? 's' : ''}"
 				title="Restart {selectedNonSystem.length}"
 				variant="secondary"
@@ -1639,16 +1635,14 @@
 			>
 				{#snippet children({ open })}
 					<span class="inline-flex items-center gap-1 px-1.5 py-0 rounded border border-border hover:border-foreground/30 hover:shadow transition-all cursor-pointer {bulkActionInProgress ? 'opacity-50' : ''}">
-						<RotateCw class="w-3 h-3" />
-						Restart
-					</span>
+						<RotateCw class="w-3 h-3" />重启</span>
 				{/snippet}
 			</ConfirmPopover>
 			{/if}
 			{#if selectedNonSystem.length > 0 && $canAccess('containers', 'remove')}
 			<ConfirmPopover
 				open={confirmBulkRemove}
-				action="Remove"
+				action="移除"
 				itemType="{selectedNonSystem.length} container{selectedNonSystem.length !== 1 ? 's' : ''}"
 				title="Remove {selectedNonSystem.length}"
 				unstyled
@@ -1657,9 +1651,7 @@
 			>
 				{#snippet children({ open })}
 					<span class="inline-flex items-center gap-1 px-1.5 py-0 rounded border border-border hover:text-destructive hover:border-destructive/40 hover:shadow transition-all cursor-pointer {bulkActionInProgress ? 'opacity-50' : ''}">
-						<Trash2 class="w-3 h-3" />
-						Remove
-					</span>
+						<Trash2 class="w-3 h-3" />移除</span>
 				{/snippet}
 			</ConfirmPopover>
 			{/if}
@@ -1820,7 +1812,7 @@
 										action="Update"
 										itemType="container"
 										itemName={container.name}
-										title="Update available - click to update"
+										title="有可用更新，点击更新"
 										onConfirm={() => updateSingleContainer(container.id, container.name)}
 										onOpenChange={(open) => confirmImageUpdateId = open ? container.id : null}
 									>
@@ -2122,7 +2114,7 @@
 									action="Update"
 									itemType="container"
 									itemName={container.name}
-									title="Update available - click to update"
+									title="有可用更新，点击更新"
 									onConfirm={() => updateSingleContainer(container.id, container.name)}
 									onOpenChange={(open) => confirmUpdateId = open ? container.id : null}
 								>
@@ -2230,7 +2222,7 @@
 													</div>
 													{#if terminalMode === 'exec'}
 														<div class="space-y-1.5">
-															<Label class="text-xs">Shell</Label>
+															<Label class="text-xs">终端</Label>
 															<Select.Root type="single" bind:value={terminalShell}>
 																<Select.Trigger class="w-full h-8 text-xs">
 																	<Shell class="w-3 h-3 mr-1.5 text-muted-foreground" />
@@ -2314,7 +2306,7 @@
 							<button
 								type="button"
 								onclick={() => browseFiles(container)}
-								title="Browse files"
+								title="浏览文件"
 								class="p-0.5 rounded hover:bg-muted transition-colors opacity-70 hover:opacity-100 cursor-pointer"
 							>
 								<FolderOpen class="grid-action-icon grid-action-info text-muted-foreground hover:text-foreground" />
@@ -2323,7 +2315,7 @@
 							<button
 								type="button"
 								onclick={() => inspectContainer(container)}
-								title="View details"
+								title="查看详情"
 								class="p-0.5 rounded hover:bg-muted transition-colors opacity-70 hover:opacity-100 cursor-pointer"
 							>
 								<Eye class="grid-action-icon grid-action-info text-muted-foreground hover:text-foreground" />
@@ -2332,7 +2324,7 @@
 							<button
 								type="button"
 								onclick={() => editContainer(container.id)}
-								title="Edit"
+								title="编辑"
 								class="p-0.5 rounded hover:bg-muted transition-colors opacity-70 hover:opacity-100 cursor-pointer"
 							>
 								<Pencil class="grid-action-icon grid-action-edit text-muted-foreground hover:text-foreground" />
@@ -2355,7 +2347,7 @@
 								<button
 									type="button"
 									onclick={() => startContainer(container.id)}
-									title="Start"
+									title="启动"
 									class="p-0.5 rounded hover:bg-muted transition-colors opacity-70 hover:opacity-100 cursor-pointer"
 								>
 									<Play class="grid-action-icon grid-action-start text-muted-foreground hover:text-green-500" />
@@ -2365,10 +2357,10 @@
 							{#if $canAccess('containers', 'restart')}
 							<ConfirmPopover
 								open={confirmRestartId === container.id}
-								action="Restart"
+								action="重启"
 								itemType="container"
 								itemName={container.name}
-								title="Restart"
+								title="重启"
 								variant="secondary"
 								onConfirm={() => restartContainer(container.id)}
 								onOpenChange={(open) => confirmRestartId = open ? container.id : null}
@@ -2392,10 +2384,10 @@
 								{#if $canAccess('containers', 'stop')}
 								<ConfirmPopover
 									open={confirmStopId === container.id}
-									action="Stop"
+									action="停止"
 									itemType="container"
 									itemName={container.name}
-									title="Stop"
+									title="停止"
 									onConfirm={() => stopContainer(container.id)}
 									onOpenChange={(open) => confirmStopId = open ? container.id : null}
 								>
@@ -2409,10 +2401,10 @@
 							{#if !container.systemContainer && $canAccess('containers', 'remove')}
 							<ConfirmPopover
 								open={confirmDeleteId === container.id}
-								action="Delete"
+								action="删除"
 								itemType="container"
 								itemName={container.name}
-								title="Remove"
+								title="移除"
 								onConfirm={() => removeContainer(container.id)}
 								onOpenChange={(open) => confirmDeleteId = open ? container.id : null}
 							>

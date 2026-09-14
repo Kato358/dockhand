@@ -128,7 +128,7 @@
 <div class="flex-1 min-h-0 flex flex-col gap-3 overflow-hidden">
 	<!-- Header -->
 	<div class="shrink-0 flex flex-wrap justify-between items-center gap-3 min-h-8">
-		<PageHeader icon={LibraryBig} title="Templates" count={loading ? undefined : filteredTemplates.length} showConnection={false}>
+		<PageHeader icon={LibraryBig} title="模板" count={loading ? undefined : filteredTemplates.length} showConnection={false}>
 			<button
 				class="p-1 rounded hover:bg-muted transition-colors"
 				onclick={() => fetchTemplates(true)}

@@ -542,7 +542,7 @@
 	let showPathChangeConfirm = $state(false);
 	let pathChangeOldDir = $state<string | null>(null); // Old directory to move files from
 	let pathChangeFileCount = $state(0); // Number of files in old directory
-	let pendingSaveRestart = $state(false); // Whether user clicked "Save & restart" vs "Save"
+	let pendingSaveRestart = $state(false); // Whether user clicked "Save & restart" vs "保存"
 	// Pull/build/forceRecreate chosen in the "Save & redeploy" RedeployPopover (see
 	// handleSave below) -- carried across the path-change confirmation dialog the same
 	// way pendingSaveRestart is, so re-entering handleSave() after the user confirms a
@@ -1799,7 +1799,7 @@
 			requestBody.secretProviderId = formSecretProviderId;
 
 			// Only meaningful when restart is true -- deployOptions is undefined for the
-			// plain "Save" button, which never reaches deployStack server-side anyway.
+			// plain "保存" button, which never reaches deployStack server-side anyway.
 			if (restart && deployOptions) {
 				requestBody.pull = deployOptions.pull;
 				requestBody.build = deployOptions.build;
@@ -2687,11 +2687,9 @@
 
 			<div class="flex items-center gap-2">
 				{#if readonly}
-					<Button onclick={tryClose}>Close</Button>
+					<Button onclick={tryClose}>关闭</Button>
 				{:else}
-					<Button variant="outline" onclick={tryClose} disabled={saving}>
-						Cancel
-					</Button>
+					<Button variant="outline" onclick={tryClose} disabled={saving}>取消</Button>
 				{/if}
 
 				{#if !readonly && mode === 'create'}
@@ -2831,9 +2829,7 @@
 			Would you like to move all files to the new location, or leave them in place?
 		</p>
 		<div class="flex justify-end gap-1.5 mt-4">
-			<Button variant="outline" size="sm" onclick={() => showPathChangeConfirm = false}>
-				Cancel
-			</Button>
+			<Button variant="outline" size="sm" onclick={() => showPathChangeConfirm = false}>取消</Button>
 			<Button variant="secondary" size="sm" onclick={confirmPathChangeKeepFiles}>
 				Leave files
 			</Button>
@@ -2870,9 +2866,7 @@
 			</div>
 		</div>
 		<div class="flex justify-end gap-1.5 mt-4">
-			<Button variant="outline" size="sm" onclick={cancelBrowseConfirm}>
-				Cancel
-			</Button>
+			<Button variant="outline" size="sm" onclick={cancelBrowseConfirm}>取消</Button>
 			<Button variant="default" size="sm" onclick={confirmBrowseAndLoad}>
 				Replace content
 			</Button>
@@ -2933,9 +2927,7 @@
 			</div>
 		</div>
 		<div class="flex justify-end gap-1.5 mt-4">
-			<Button variant="outline" size="sm" onclick={cancelChangeLocation} disabled={movingLocation}>
-				Cancel
-			</Button>
+			<Button variant="outline" size="sm" onclick={cancelChangeLocation} disabled={movingLocation}>取消</Button>
 			<Button variant="default" size="sm" onclick={confirmChangeLocation} disabled={movingLocation}>
 				{#if movingLocation}
 					<Loader2 class="w-3.5 h-3.5 animate-spin" />
